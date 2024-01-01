@@ -16,10 +16,13 @@ const WaColor = "#ffe6e6";//light red
 
 //Mutation observer to detect when the table is loaded
 const tableLoader = new MutationObserver(highlightTitles);
-tableLoader.observe(document.querySelector("table[class='table table-bordered problemsList']"), {
-    childList: true,
-    subtree: true,
-});
+const tableElem = document.querySelector("table[class='table table-bordered problemsList']");
+if (tableElem !== null) {
+    tableLoader.observe(tableElem, {
+        childList: true,
+        subtree: true,
+    });
+}
 
 function highlightTitles() {
     console.log("Ini of AeRForU: highlighting problems")
