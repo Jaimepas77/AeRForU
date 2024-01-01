@@ -11,12 +11,18 @@ function getUsername() {
     return username;
 }
 
-const AcColor = "gray";
-const WaColor = "#8f2d06";//dark red
+const AcColor = "#f2fff2";//light green
+const WaColor = "#ffe6e6";//light red
 
-//Wait until 3 seconds passed
-setTimeout(() => {
-    console.log("Ini of AeRForU")
+//Mutation observer to detect when the table is loaded
+const tableLoader = new MutationObserver(highlightTitles);
+tableLoader.observe(document.querySelector("table[class='table table-bordered problemsList']"), {
+    childList: true,
+    subtree: true,
+});
+
+function highlightTitles() {
+    console.log("Ini of AeRForU: highlighting problems")
     if (username !== false) {
         // Get the list of words to highlight
         const words = getTitles();
@@ -38,32 +44,23 @@ setTimeout(() => {
         textNodes.forEach(node => {
             //console.log("Node: " + node.innerHTML);
             if (node.innerHTML.match(regexAc)) {
-                //Change the font color to gray (title)
-                node.style.color = AcColor;
-                //(number of problem)
-                //console.log(node.parentNode.previousSibling.previousSibling);
-                node.parentNode.previousSibling.previousSibling.firstChild.style.color = AcColor;
+                node.parentNode.parentNode.style.backgroundColor = AcColor;
             }
             else if (node.innerHTML.match(regexWa)) {
-                //Change the font color to red (title) and italic
-                node.style.color = WaColor;
-                node.style.fontStyle = "italic";
-
-                //(number of problem)
-                node.parentNode.previousSibling.previousSibling.firstChild.style.color = WaColor;
-                node.parentNode.previousSibling.previousSibling.firstChild.style.fontStyle = "italic";
+                node.parentNode.parentNode.style.backgroundColor = WaColor;
             }
-            else if (node.parentNode.className === "problemsInfo-title") {
-                //console.log("Title: " + node.innerHTML);
-                //bold the title
-                node.style.fontWeight = "bold";
-                //(number of problem)
-                node.parentNode.previousSibling.previousSibling.firstChild.style.fontWeight = "bold";
-            }
+            //Si quieres que se ponga en negrita el título de los problemas descomenta esto
+            // if (node.parentNode.className === "problemsInfo-title") {
+            //     //console.log("Title: " + node.innerHTML);
+            //     //bold the title
+            //     node.parentNode.style.fontWeight = "bold";
+            //     //bold the number of problem
+            //     node.parentNode.previousSibling.previousSibling.style.fontWeight = "bold";
+            // }
         });
     }
     console.log("End of AeRForU");
-}, 40);
+}
 
 //Function to get the words to highlight
 function getTitles() {
