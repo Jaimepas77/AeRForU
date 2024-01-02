@@ -1,5 +1,5 @@
 # AeRForU
-Acepta el Reto for u es una extensión de Google Chrome para la plataforma de [aceptaelreto.com](aceptaelreto.com).
+Acepta el Reto for u es una extensión de Google Chrome para la plataforma de [aceptaelreto.com](https://aceptaelreto.com).
 El objetivo de la extensión es permitir al usuario diferenciar los problemas resueltos de los no resueltos en las listas de problemas.
 
 ## Aspecto visual
