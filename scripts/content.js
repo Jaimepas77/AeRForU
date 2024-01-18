@@ -46,10 +46,10 @@ function highlightTitles() {
         //Iterate over each text node
         textNodes.forEach(node => {
             //console.log("Node: " + node.innerHTML);
-            if (node.innerHTML.match(regexAc)) {
+            if (wordsToAc.length > 0 && node.innerHTML.match(regexAc)) {
                 node.parentNode.parentNode.style.backgroundColor = AcColor;
             }
-            else if (node.innerHTML.match(regexWa)) {
+            else if (wordsToWa.length > 0 && node.innerHTML.match(regexWa)) {
                 node.parentNode.parentNode.style.backgroundColor = WaColor;
             }
             //Si quieres que se ponga en negrita el título de los problemas descomenta esto
@@ -100,6 +100,7 @@ function getTitles() {
         const regex2 = new RegExp(">[0-9]+ - [^<]+</a>", "gi"); //Only the title part
         //const regex = new RegExp(">[a-zA-Z0-9]+ - [a-zA-Z0-9 ]+</a>", "gi");
         const matches1 = request.responseText.match(regex1);
+        if (matches1 === null) return;
         //Matches is matches1 that matches regex2
         const matches = matches1.join("").match(regex2);
         //console.log("Hey: " + matches);
