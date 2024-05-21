@@ -14,21 +14,14 @@ function getUsername() {
 const AcColor = "#f2fff2";//light green
 const WaColor = "#ffe6e6";//light red
 
-//Mutation observer to detect when the table is loaded
-const tableLoader = new MutationObserver(highlightTitles);
-const tableElem = document.querySelector("table[class='table table-bordered problemsList']");
-if (tableElem !== null) {
-    tableLoader.observe(tableElem, {
-        childList: true,
-        subtree: true,
-    });
-}
+// Highlight the titles of the problems when the page is loaded
+window.onload = highlightTitles;
 
-function highlightTitles() {
+async function highlightTitles() {
     console.log("Ini of AeRForU: highlighting problems")
     if (username !== false) {
         // Get the list of words to highlight
-        const words = getTitles();
+        const words = await getTitles();
         const wordsToAc = words.wordsAc;
         const wordsToWa = words.wordsWa;
         
@@ -66,7 +59,7 @@ function highlightTitles() {
 }
 
 //Function to get the words to highlight
-function getTitles() {
+async function getTitles() {
     const wordsAc = [];
     const wordsWa = [];
     
@@ -75,31 +68,18 @@ function getTitles() {
     url = baseSearchUrl.replace("${username}", username);
     //console.log("URL: " + url);
     //We need to make a request to the url
-    const request = new XMLHttpRequest();
-    request.open("GET", url, false);
-    request.send(null);
+    const request = await fetch(url);
 
-    if (request.status === 302) {
-        const baseUrl = "https://aceptaelreto.com${url}"
-        url = baseUrl.replace("${url}", request.getResponseHeader("Location"));
-        console.log("Redirecting to: " + url);
-        request.open("GET", url, false);
-        request.send(null);
-    }
-    else if (request.status !== 200) {
-        console.log("Request failed with status: " + request.status);
-        return;
-    }
+    const rText = await request.text();
+    // console.log(rText);
 
-    //console.log(request.responseText);
-
-    function fillWords(AC) {
+    async function fillWords(AC) {
         //Filter with the regex ">something - something</a> (accepts anything)
         //width if ac=true, bug if ac=false
         const regex1 = new RegExp(`${AC ? "width" : "bug"} text-muted[^c]+>[0-9]+ - [^<]+<\/a>`, "gi"); //Only AC
         const regex2 = new RegExp(">[0-9]+ - [^<]+</a>", "gi"); //Only the title part
         //const regex = new RegExp(">[a-zA-Z0-9]+ - [a-zA-Z0-9 ]+</a>", "gi");
-        const matches1 = request.responseText.match(regex1);
+        const matches1 = rText.match(regex1);
         if (matches1 === null) return;
         //Matches is matches1 that matches regex2
         const matches = matches1.join("").match(regex2);
@@ -117,8 +97,8 @@ function getTitles() {
             (AC ? wordsAc : wordsWa)[index] = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         });
     }
-    fillWords(true);
-    fillWords(false);
+    await fillWords(true);
+    await fillWords(false);
     
     console.log("Words to AC: " + wordsAc.length);
     console.log("Words to WA: " + wordsWa.length);
