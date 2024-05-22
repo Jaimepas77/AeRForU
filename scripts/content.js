@@ -27,8 +27,8 @@ async function highlightTitles() {
 
         // Get the list of words to highlight
         const words = await getTitles();
-        const wordsToAc = words.wordsAc;
-        const wordsToWa = words.wordsWa;
+        const wordsToAc = words.wordsAc.map(word => word.trim());
+        const wordsToWa = words.wordsWa.map(word => word.trim());
 
         //Get all the text nodes in the table
         const table = problemsInfo.children[1];
@@ -38,8 +38,8 @@ async function highlightTitles() {
         // console.log(problemNodes.children);
 
         for (const problem of problemNodes.children) {
-            const title = problem.children[1].innerText;
-            // console.log("Title: " + title);
+            const title = problem.children[1].innerText.trim();
+            console.log("Title: " + title);
             if (wordsToAc.length > 0 && wordsToAc.includes(title)) {
                 problem.style.backgroundColor = AcColor;
             }
@@ -92,7 +92,7 @@ async function getTitles() {
         (AC ? wordsAc : wordsWa).push(...words);
         //Escape the regex characters
         (AC ? wordsAc : wordsWa).forEach((word, index) => {
-            (AC ? wordsAc : wordsWa)[index] = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            (AC ? wordsAc : wordsWa)[index] = word.replace(/\[\.\*\+\?\^\$\{\}\(\)\|\[\]\\]/g, '');
         });
     }
     await fillWords(true);
