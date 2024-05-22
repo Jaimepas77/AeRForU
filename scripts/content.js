@@ -13,6 +13,7 @@ function getUsername() {
 
 const AcColor = "#f2fff2";//light green
 const WaColor = "#ffe6e6";//light red
+const BOLD = true;
 
 // Highlight the titles of the problems when the page is loaded
 window.onload = highlightTitles;
@@ -24,36 +25,29 @@ async function highlightTitles() {
         const words = await getTitles();
         const wordsToAc = words.wordsAc;
         const wordsToWa = words.wordsWa;
-        
-        // Create a regex with all the words to highlight
-        const regexAc = new RegExp(wordsToAc.join("|"), "gi");
-        //console.log(regex1);
-        const regexWa = new RegExp(wordsToWa.join("|"), "gi");
 
         //Get all the text nodes in the table
-        const table = document.querySelector("table[class='table table-bordered problemsList']");
-        //console.log(table);
-        const textNodes = table.querySelectorAll("a");
-        //console.log([...textNodes]);
+        const table = document.getElementById("problemsInfo").children[1];
+        // console.log(table);
 
-        //Iterate over each text node
-        textNodes.forEach(node => {
-            //console.log("Node: " + node.innerHTML);
-            if (wordsToAc.length > 0 && node.innerHTML.match(regexAc)) {
-                node.parentNode.parentNode.style.backgroundColor = AcColor;
+        const problemNodes = table.children[3]
+        // console.log(problemNodes.children);
+
+        for (const problem of problemNodes.children) {
+            const title = problem.children[1].innerText;
+            // console.log("Title: " + title);
+            if (wordsToAc.length > 0 && wordsToAc.includes(title)) {
+                problem.style.backgroundColor = AcColor;
             }
-            else if (wordsToWa.length > 0 && node.innerHTML.match(regexWa)) {
-                node.parentNode.parentNode.style.backgroundColor = WaColor;
+            else if (wordsToWa.length > 0 && wordsToWa.includes(title)) {
+                problem.style.backgroundColor = WaColor;
             }
-            //Si quieres que se ponga en negrita el título de los problemas descomenta esto
-            // if (node.parentNode.className === "problemsInfo-title") {
-            //     //console.log("Title: " + node.innerHTML);
-            //     //bold the title
-            //     node.parentNode.style.fontWeight = "bold";
-            //     //bold the number of problem
-            //     node.parentNode.previousSibling.previousSibling.style.fontWeight = "bold";
-            // }
-        });
+
+            if (BOLD) {
+                problem.children[0].style.fontWeight = "bold";
+                problem.children[1].style.fontWeight = "bold";
+            }
+        }
     }
     console.log("End of AeRForU");
 }
