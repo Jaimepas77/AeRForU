@@ -2,7 +2,7 @@
 const username = getUsername();
 //Function to get the username
 function getUsername() {
-    const icon = document.querySelector("i[class='icon icon-user']");
+    const icon = document.getElementsByClassName("icon icon-user")[0];
     const username = icon.parentNode.textContent.trim();
     if (username === "Login") {
         return false;
@@ -21,13 +21,17 @@ window.onload = highlightTitles;
 async function highlightTitles() {
     console.log("Ini of AeRForU: highlighting problems")
     if (username !== false) {
+        const problemsInfo = document.getElementById("problemsInfo");
+
+        if (problemsInfo === null) return;
+
         // Get the list of words to highlight
         const words = await getTitles();
         const wordsToAc = words.wordsAc;
         const wordsToWa = words.wordsWa;
 
         //Get all the text nodes in the table
-        const table = document.getElementById("problemsInfo").children[1];
+        const table = problemsInfo.children[1];
         // console.log(table);
 
         const problemNodes = table.children[3]
