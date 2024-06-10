@@ -22,5 +22,8 @@
                 "*://aceptaelreto.com/problems/*"
             ]
         }
+    ],
+    "permissions": [
+        "storage"
     ]
 }

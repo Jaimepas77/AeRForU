@@ -1,7 +1,29 @@
 <html>
-    <body style="background-color: rgb(0, 183, 255);" leftmargin="100px">
-        <h1 style="color: rgb(255, 171, 16); font-family: Comic Sans MS; text-align: center; font-size: 70px;">
-            Wellcome to AeRForU!
-        </h1>
-    </body>
+
+<body style="background-color: rgb(0, 183, 255);" leftmargin="100px">
+    <h1 style="color: rgb(255, 171, 16); font-family: Comic Sans MS; text-align: center; font-size: 70px;">
+        Welcome to AeRForU!
+    </h1>
+
+    <script defer src="options.js" type="module"></script>
+    <form id="optionsForm" style="display: grid; justify-content: center; grid-gap: 0.8em;">
+        <label for="bold" style="display: block; font-size: 20px;">
+            <input type="checkbox" name="bold" id="bold" style="width: 20px; height: 20px;">
+            Enable bold text
+        </label>
+        <label for="AcColor" style="display: block; font-size: 20px;">
+            <input type="color" name="AcColor" id="AcColor" style="width: 60px; height: 30px;">
+            AC color
+        </label>
+        <label for="WaColor" style="display: block; font-size: 20px;">
+            <input type="color" name="WaColor" id="WaColor" style="width: 60px; height: 30px;">
+            WA color
+        </label>
+        <label for="Reset" style="display: block;">
+            <!-- big sized button, width augmented-->
+            <input type="button" name="Reset" id="Reset" value="Reset" style="font-size: 23px; width: 100%;">
+        </label>
+    </form>
+</body>
+
 </html>

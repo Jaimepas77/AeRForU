@@ -11,9 +11,59 @@ function getUsername() {
     return username;
 }
 
-const AcColor = "#f2fff2";//light green
-const WaColor = "#ffe6e6";//light red
-const BOLD = true;
+// Settings
+let AcColor = "#f2fff2";//light green
+let WaColor = "#ffe6e6";//light red
+let BOLD = true;
+chrome.storage.local.get(["BOLD", "AcColor", "WaColor"], function (data) {
+    if(data.BOLD !== undefined){
+        BOLD = data.BOLD;
+    }
+    else{
+        chrome.storage.local.set({ BOLD: BOLD });
+    }
+    if(data.AcColor !== undefined){
+        AcColor = data.AcColor;
+    }
+    else{
+        chrome.storage.local.set({ AcColor: AcColor });
+    }
+    if(data.WaColor !== undefined){
+        WaColor = data.WaColor;
+    }
+    else{
+        chrome.storage.local.set({ WaColor: WaColor });
+    }
+    // console.log("BOLD: " + BOLD);
+    // console.log("AcColor: " + AcColor);
+    // console.log("WaColor: " + WaColor);
+});
+
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+    if (namespace === 'local') {
+        for (key in changes) {
+            if (key === 'BOLD') {
+                BOLD = changes[key].newValue;
+            }
+            else if (key === 'AcColor') {
+                AcColor = changes[key].newValue;
+            }
+            else if (key === 'WaColor') {
+                WaColor = changes[key].newValue;
+            }
+        }
+    }
+});
+
+// Debugging the storage
+// chrome.storage.onChanged.addListener((changes, namespace) => {
+//     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+//         console.log(
+//             `Storage key "${key}" in namespace "${namespace}" changed.`,
+//             `Old value was "${oldValue}", new value is "${newValue}".`
+//         );
+//     }
+// });
 
 // Highlight the titles of the problems when the page is loaded
 window.onload = highlightTitles;
