@@ -16,22 +16,22 @@ let AcColor = "#f2fff2";//light green
 let WaColor = "#ffe6e6";//light red
 let BOLD = true;
 chrome.storage.local.get(["BOLD", "AcColor", "WaColor"], function (data) {
-    if(data.BOLD !== undefined){
+    if (data.BOLD !== undefined) {
         BOLD = data.BOLD;
     }
-    else{
+    else {
         chrome.storage.local.set({ BOLD: BOLD });
     }
-    if(data.AcColor !== undefined){
+    if (data.AcColor !== undefined) {
         AcColor = data.AcColor;
     }
-    else{
+    else {
         chrome.storage.local.set({ AcColor: AcColor });
     }
-    if(data.WaColor !== undefined){
+    if (data.WaColor !== undefined) {
         WaColor = data.WaColor;
     }
-    else{
+    else {
         chrome.storage.local.set({ WaColor: WaColor });
     }
     // console.log("BOLD: " + BOLD);
@@ -76,9 +76,10 @@ async function highlightTitles() {
         if (problemsInfo === null) return;
 
         // Get the list of words to highlight
-        const words = await getTitles();
+        const words = await getInfo();
         const wordsToAc = words.wordsAc.map(word => word.trim());
         const wordsToWa = words.wordsWa.map(word => word.trim());
+        const userID = words.userID;
 
         //Get all the text nodes in the table
         const table = problemsInfo.children[1];
@@ -95,6 +96,7 @@ async function highlightTitles() {
             }
             else if (wordsToWa.length > 0 && wordsToWa.includes(title)) {
                 problem.style.backgroundColor = WaColor;
+                addError(problem, userID);
             }
 
             if (BOLD) {
@@ -106,11 +108,104 @@ async function highlightTitles() {
     console.log("End of AeRForU");
 }
 
+async function addError(problem, userID) {
+    // Get the problem ID
+    const problemId = problem.children[0].innerText.trim();
+    console.log("Problem ID: " + problemId);
+
+    // Get the last submission
+    let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
+    problem_submissions_url = problem_submissions_url.replace("${userID}", userID);
+    problem_submissions_url = problem_submissions_url.replace("${problemId}", problemId);
+
+    const request = await fetch(problem_submissions_url);
+    const submissions = await request.json();
+    // console.log(submissions.submission[0].result);
+    let result = submissions.submission[0].result;
+    let link = "https://aceptaelreto.com/doc/verdicts.php";
+
+    // Add the error message
+    const label = document.createElement('label');
+    label.className = 'error-label';
+    if (result === "PE") {
+        label.setAttribute('data-tooltip', 'Presentation Error');
+    }
+    else if (result === "WA") {
+        label.setAttribute('data-tooltip', 'Wrong Answer');
+    }
+    else if (result === "CE") {
+        label.setAttribute('data-tooltip', 'Compilation Error');
+    }
+    else if (result === "RTE") {
+        label.setAttribute('data-tooltip', 'Runtime Error');
+    }
+    else if (result === "TL") {
+        result = "TLE";
+        label.setAttribute('data-tooltip', 'Time Limit Exceeded');
+    }
+    else if (result === "ML") {
+        result = "MLE";
+        label.setAttribute('data-tooltip', 'Memory Limit Exceeded');
+    }
+    else if (result === "OLE") {
+        label.setAttribute('data-tooltip', 'Output Limit Exceeded');
+    }
+    else if (result === "RF") {
+        label.setAttribute('data-tooltip', 'Restricted Function');
+    }
+    else if (result === "IR") {
+        result = "IE";
+        label.setAttribute('data-tooltip', 'Internal Error');
+    }
+    link += "#" + result;
+    label.innerText = result;
+    
+    linkNode = document.createElement('a')
+    linkNode.setAttribute('href', link)
+    problem.children[1].appendChild(linkNode);
+    problem.children[1].children[1].appendChild(label);
+
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .error-label {
+            background-color: red;
+            color: white;
+            padding: 5px 7px;
+            border-radius: 5px;
+            cursor: help;
+            position: relative;
+            margin-left: 8px;
+            margin-bottom: 0px;
+            font-size: 0.9em;
+        }
+
+        .error-label::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            background-color: black;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            display: none;
+            z-index: 1;
+        }
+
+        .error-label:hover::after {
+            display: block;
+        }`;
+    document.head.appendChild(style);
+
+}
+
 //Function to get the words to highlight
-async function getTitles() {
+async function getInfo() {
     const wordsAc = [];
     const wordsWa = [];
-    
+
     //We need to webscrap the words to highlight
     const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
     url = baseSearchUrl.replace("${username}", username);
@@ -120,6 +215,12 @@ async function getTitles() {
 
     const rText = await request.text();
     // console.log(rText);
+
+    //Get the user ID
+    const finalUrl = request.url;
+    // console.log("Final URL: " + finalUrl);
+    const userID = finalUrl.split("id=")[1];
+    // console.log("User ID: " + userID);
 
     async function fillWords(AC) {
         //Filter with the regex ">something - something</a> (accepts anything)
@@ -147,9 +248,9 @@ async function getTitles() {
     }
     await fillWords(true);
     await fillWords(false);
-    
+
     console.log("Words to AC: " + wordsAc.length);
     console.log("Words to WA: " + wordsWa.length);
 
-    return {wordsAc, wordsWa};
+    return { wordsAc, wordsWa, userID };
 }
