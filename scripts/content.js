@@ -1,5 +1,6 @@
 //First we need to get the username
-const username = getUsername();
+const username = "";
+
 //Function to get the username
 function getUsername() {
     const icon = document.getElementsByClassName("icon icon-user")[0];
@@ -15,7 +16,8 @@ function getUsername() {
 let AcColor = "#f2fff2";//light green
 let WaColor = "#ffe6e6";//light red
 let BOLD = true;
-chrome.storage.local.get(["BOLD", "AcColor", "WaColor"], function (data) {
+let HYPERLINK = true; //24en23 hyperlinks
+chrome.storage.local.get(["BOLD", "AcColor", "WaColor", "hyperlinks"], function (data) {
     if (data.BOLD !== undefined) {
         BOLD = data.BOLD;
     }
@@ -34,9 +36,16 @@ chrome.storage.local.get(["BOLD", "AcColor", "WaColor"], function (data) {
     else {
         chrome.storage.local.set({ WaColor: WaColor });
     }
+    if (data.hyperlinks !== undefined) {
+        HYPERLINK = data.hyperlinks;
+    }
+    else {
+        chrome.storage.local.set({ hyperlinks: HYPERLINK });
+    }
     // console.log("BOLD: " + BOLD);
     // console.log("AcColor: " + AcColor);
     // console.log("WaColor: " + WaColor);
+    // console.log("HYPERLINK: " + HYPERLINK);
 });
 
 chrome.storage.onChanged.addListener(function (changes, namespace) {
@@ -50,6 +59,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
             }
             else if (key === 'WaColor') {
                 WaColor = changes[key].newValue;
+            }
+            else if (key === 'hyperlinks') {
+                HYPERLINK = changes[key].newValue;
             }
         }
     }
@@ -66,7 +78,19 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 // });
 
 // Highlight the titles of the problems when the page is loaded
-window.onload = highlightTitles;
+window.onload = async function () {
+    if (window.location.href.includes("aceptaelreto.com/problems/")) { //Problems page
+        console.log("Problems page");
+        username = getUsername();
+        highlightTitles();
+    }
+    else if (window.location.href.includes("aceptaelreto.com/24en23")
+                && window.location.href.includes("/clasificacion.php")
+                && HYPERLINK) { //24en23 page
+        console.log("24en23 page");
+        addHyperlinks();
+    }
+};
 
 async function highlightTitles() {
     console.log("Ini of AeRForU: highlighting problems")

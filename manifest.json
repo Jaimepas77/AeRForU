@@ -16,10 +16,12 @@
     "content_scripts": [
         {
             "js": [
-                "scripts/content.js"
+                "scripts/content.js",
+                "scripts/hyperlink.js"
             ],
             "matches": [
-                "*://aceptaelreto.com/problems/*"
+                "*://aceptaelreto.com/problems/*",
+                "*://aceptaelreto.com/24en23/*/clasificacion.php"
             ]
         }
     ],
