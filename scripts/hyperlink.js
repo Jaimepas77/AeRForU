@@ -19,7 +19,8 @@ const observer = new MutationObserver(mutations => {
 });
 
 async function getUsers() {
-    const usersLink = "https://aceptaelreto.com/24en23/2024/bin/users.php";
+    year = window.location.href.split("/")[4];
+    const usersLink = "https://aceptaelreto.com/24en23/${year}/bin/users.php".replace("${year}", year);
     const request = await fetch(usersLink);
     usersPage = await request.json();
 }
