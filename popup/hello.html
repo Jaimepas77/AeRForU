@@ -1,6 +1,8 @@
 <html>
 
-<head></head>
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
 
 <body style="background-color: rgb(0, 183, 255);" leftmargin="100px">
     <h1 style="color: rgb(255, 171, 16); font-family: Comic Sans MS; text-align: center; font-size: 70px;">
@@ -14,7 +16,11 @@
 
     <form id="optionsForm" style="display: grid; justify-content: center; grid-gap: 0.8em;">
         <label for="bold" style="display: block; font-size: 20px;">
-            <input type="checkbox" name="bold" id="bold" style="width: 20px; height: 20px;">
+            <!--input type="checkbox" name="bold" id="bold" style="width: 20px; height: 20px;"-->
+            <label class="switch">
+                <input type="checkbox" name="bold" id="bold">
+                <span class="slider round"></span>
+            </label>
             Enable bold text
         </label>
         <label for="AcColor" style="display: block; font-size: 20px;">
@@ -36,8 +42,12 @@
         24 en 23 settings
     </h2>
     <form id="optionsForm24en23" style="display: grid; justify-content: center; grid-gap: 0.8em;">
-        <label for="hyperlinks" style="display: block; font-size: 20px;">
-            <input type="checkbox" name="hyperlinks" id="hyperlinks" style="width: 20px; height: 20px;">
+        <label for="hyperlinks" style="display: block; font-size: 20px; text-align: center;">
+            <!--input type="checkbox" name="hyperlinks" id="hyperlinks" style="width: 20px; height: 20px;"-->
+            <label class="switch">
+                <input type="checkbox" name="hyperlinks" id="hyperlinks">
+                <span class="slider round"></span>
+            </label>
             Enable hyperlinks
         </label>
     </form>
