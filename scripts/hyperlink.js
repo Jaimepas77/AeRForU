@@ -1,12 +1,33 @@
 // Hyperlinks for 24 en 23
-async function addHyperlinks() {
+let usersPage; //Source of the usernames and IDs
+let usersRanking; //The ranking table
+
+// Observe the body for changes in the ranking
+const observer = new MutationObserver(mutations => {
+    mutations.forEach(async mutation => {
+        if (mutation.addedNodes.length > 0) {
+            console.log("Mutation observer started");
+            observer.disconnect();
+            await addHyperlinks();
+            observer.observe(mutation.target, {
+                childList: true,
+                subtree: true
+            });
+            console.log("Mutation observer finished");
+        }
+    });
+});
+
+async function getUsers() {
     const usersLink = "https://aceptaelreto.com/24en23/2024/bin/users.php";
     const request = await fetch(usersLink);
-    const usersPage = await request.json();
-    const usersInfo = document.getElementsByClassName("card-body")[0];
-    // console.log(usersInfo);
+    usersPage = await request.json();
+}
 
-    const table = usersInfo.children[2];
+async function initHyperlinks() {
+    usersRanking = document.getElementsByClassName("card-body")[0];
+
+    const table = usersRanking.children[2];
     // console.log(table);
 
     const userNodes = table.children[1];
@@ -17,9 +38,41 @@ async function addHyperlinks() {
         await new Promise(resolve => setTimeout(resolve, 100));
     }
 
+    await addHyperlinks();
+
+    observer.observe(userNodes, {
+        childList: true,
+        subtree: true
+    });
+}
+
+async function addHyperlinks() {
+    if (usersPage === undefined) {
+        await getUsers();
+    }
+    // console.log(usersRanking);
+
+    const table = usersRanking.children[2];
+    // console.log(table);
+
+    const userNodes = table.children[1];
+    // console.log(userNodes.children[0]);
+
+    while (userNodes.children.length == 0) { //Wait for full loading
+        // Check every 100ms
+        // await new Promise(resolve => setTimeout(resolve, 1000));
+        return;
+    }
+
     for (const user of userNodes.children) {
         const userTD = user.children[1];
         // console.log(userTD);
+
+        // If hyperlink already exists, skip
+        if (userTD.children.length > 0) {
+            console.log("Already a hyperlink");
+            continue;
+        }
 
         // Change the text to a hyperlink
         const username = userTD.innerText;

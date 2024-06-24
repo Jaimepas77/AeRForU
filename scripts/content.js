@@ -1,5 +1,5 @@
 //First we need to get the username
-const username = "";
+let username = "";
 
 //Function to get the username
 function getUsername() {
@@ -88,7 +88,8 @@ window.onload = async function () {
                 && window.location.href.includes("/clasificacion.php")
                 && HYPERLINK) { //24en23 page
         console.log("24en23 page");
-        addHyperlinks();
+        // addHyperlinks();
+        initHyperlinks();
     }
 };
 
