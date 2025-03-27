@@ -1,56 +1,52 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeRForU Settings</title>
 </head>
+<body>
+    <div class="container">
+        <h1 class="title">Welcome to AeRForU!</h1>
 
-<body style="background-color: rgb(0, 183, 255);" leftmargin="100px">
-    <h1 style="color: rgb(255, 171, 16); font-family: Comic Sans MS; text-align: center; font-size: 70px;">
-        Welcome to AeRForU!
-    </h1>
+        <h2 class="section-title">Problem List Settings</h2>
+        <form id="optionsForm" class="settings-form">
+            <div class="setting-item">
+                <label for="bold" class="setting-label">Enable bold text</label>
+                <label class="switch">
+                    <input type="checkbox" name="bold" id="bold">
+                    <span class="slider round"></span>
+                </label>
+            </div>
 
-    <script defer="" src="options.js" type="module"></script>
-    <h2 style="color: blue; font-family: Comic Sans MS; text-align: center; font-size: 25px;">
-        Problem list settings
-    </h2>
+            <div class="setting-item">
+                <label for="AcColor" class="setting-label">AC color</label>
+                <input type="color" name="AcColor" id="AcColor" class="color-input">
+            </div>
 
-    <form id="optionsForm" style="display: grid; justify-content: center; grid-gap: 0.8em;">
-        <label for="bold" style="display: block; font-size: 20px;">
-            <!--input type="checkbox" name="bold" id="bold" style="width: 20px; height: 20px;"-->
-            <label class="switch">
-                <input type="checkbox" name="bold" id="bold">
-                <span class="slider round"></span>
-            </label>
-            Enable bold text
-        </label>
-        <label for="AcColor" style="display: block; font-size: 20px;">
-            <input type="color" name="AcColor" id="AcColor" style="width: 60px; height: 30px;">
-            AC color
-        </label>
-        <label for="WaColor" style="display: block; font-size: 20px;">
-            <input type="color" name="WaColor" id="WaColor" style="width: 60px; height: 30px;">
-            WA color
-        </label>
-        <label for="Reset" style="display: block;">
-            <!-- big sized button, width augmented-->
-            <input type="button" name="Reset" id="Reset" value="Reset" style="font-size: 23px; width: 100%;">
-        </label>
-    </form>
+            <div class="setting-item">
+                <label for="WaColor" class="setting-label">WA color</label>
+                <input type="color" name="WaColor" id="WaColor" class="color-input">
+            </div>
 
+            <div class="setting-item">
+                <input type="button" name="Reset" id="Reset" value="Reset" class="reset-btn">
+            </div>
+        </form>
 
-    <h2 style="color: blue; font-family: Comic Sans MS; text-align: center; font-size: 25px;">
-        24 en 23 settings
-    </h2>
-    <form id="optionsForm24en23" style="display: grid; justify-content: center; grid-gap: 0.8em;">
-        <label for="hyperlinks" style="display: block; font-size: 20px; text-align: center;">
-            <!--input type="checkbox" name="hyperlinks" id="hyperlinks" style="width: 20px; height: 20px;"-->
-            <label class="switch">
-                <input type="checkbox" name="hyperlinks" id="hyperlinks">
-                <span class="slider round"></span>
-            </label>
-            Enable hyperlinks
-        </label>
-    </form>
+        <h2 class="section-title">24 en 23 Settings</h2>
+        <form id="optionsForm24en23" class="settings-form">
+            <div class="setting-item">
+                <label for="hyperlinks" class="setting-label">Enable hyperlinks</label>
+                <label class="switch">
+                    <input type="checkbox" name="hyperlinks" id="hyperlinks">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </form>
+    </div>
+
+    <script defer src="options.js" type="module"></script>
 </body>
-
 </html>
