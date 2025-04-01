@@ -101,10 +101,11 @@ async function highlightTitles() {
         if (problemsInfo === null) return;
 
         // Get the list of words to highlight
-        const words = await getInfo();
-        const wordsToAc = words.wordsAc.map(word => word.trim());
-        const wordsToWa = words.wordsWa.map(word => word.trim());
-        const userID = words.userID;
+        //const words = await getInfo();
+        //const wordsToAc = words.wordsAc.map(word => word.trim());
+        //const wordsToWa = words.wordsWa.map(word => word.trim());
+        //const userID = words.userID;
+        const userID = await getUserID();
 
         //Get all the text nodes in the table
         const table = problemsInfo.children[1];
@@ -116,10 +117,12 @@ async function highlightTitles() {
         for (const problem of problemNodes.children) {
             const title = problem.children[1].innerText.trim();
             console.log("Title: " + title);
-            if (wordsToAc.length > 0 && wordsToAc.includes(title)) {
+            //if (wordsToAc.length > 0 && wordsToAc.includes(title)) {
+            if (await isAC(problem, userID)) {
                 problem.style.backgroundColor = AcColor;
             }
-            else if (wordsToWa.length > 0 && wordsToWa.includes(title)) {
+            //else if (wordsToWa.length > 0 && wordsToWa.includes(title)) {
+            else if (await isTried(problem, userID)) {
                 problem.style.backgroundColor = WaColor;
                 addError(problem, userID);
             }
@@ -278,4 +281,69 @@ async function getInfo() {
     console.log("Words to WA: " + wordsWa.length);
 
     return { wordsAc, wordsWa, userID };
+}
+
+async function getUserID() {
+    const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
+    url = baseSearchUrl.replace("${username}", username);
+    
+    //We need to make a request to the url
+    const request = await fetch(url, {
+        method: 'HEAD',
+        redirect: 'follow'
+    });
+
+    //Get the user ID
+    const finalUrl = request.url;
+    // console.log("Final URL: " + finalUrl);
+    return finalUrl.split("id=")[1];
+}
+
+async function isAC(problem, userID) {
+    // Get the problem ID
+    const problemId = problem.children[0].innerText.trim();
+    console.log("Problem ID: " + problemId);
+
+    // Search for an AC submission
+    let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
+    problem_submissions_url = problem_submissions_url.replace("${userID}", userID);
+    problem_submissions_url = problem_submissions_url.replace("${problemId}", problemId);
+    
+    let request = await fetch(problem_submissions_url);
+    let submissions = await request.json();
+
+    do {
+        // Loop through the submissions and check for an AC submission
+        for (const submission of submissions.submission) {
+            if (submission.result === "AC") {
+                return true;
+            }
+        }
+
+        // If there are no next link (undefined), break the loop
+        if (submissions.nextLink === undefined) {
+            break;
+        }
+        console.log("Next link: " + submissions.nextLink);
+        // Get the next page of submissions
+        request = await fetch(submissions.nextLink);
+        submissions = await request.json();
+    } while (submissions.submission.length > 0); //If there are no submissions, break the loop
+    return false;
+}
+
+async function isTried(problem, userID) {
+    // Get the problem ID
+    const problemId = problem.children[0].innerText.trim();
+    console.log("Problem ID: " + problemId);
+
+    // Search for an AC submission
+    let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
+    problem_submissions_url = problem_submissions_url.replace("${userID}", userID);
+    problem_submissions_url = problem_submissions_url.replace("${problemId}", problemId);
+    
+    const request = await fetch(problem_submissions_url);
+    const submissions = await request.json();
+
+    return submissions.submission.length !== 0;
 }
