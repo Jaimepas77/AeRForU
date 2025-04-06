@@ -96,47 +96,65 @@ window.onload = async function () {
 async function highlightTitles() {
     console.log("Ini of AeRForU: highlighting problems")
     if (username !== false) {
+        let finalTable = document.getElementById("problemsInfo").children[1].children[3];
+        try {
+            finalTable.children[0].children[1].innerText.trim(); // Intentar acceder a un elemento para verificar si la tabla está cargada
+        }
+        catch (error) {
+            console.log("Table not found yet, waiting...");
+            setTimeout(highlightTitles, 100);
+            return;
+        }
+
         const problemsInfo = document.getElementById("problemsInfo");
 
         if (problemsInfo === null) return;
 
         // Get the list of words to highlight
-        const words = await getInfo();
-        const wordsToAc = words.wordsAc.map(word => word.trim());
-        const wordsToWa = words.wordsWa.map(word => word.trim());
-        const userID = words.userID;
+        //const words = await getInfo();
+        //const wordsToAc = words.wordsAc.map(word => word.trim());
+        //const wordsToWa = words.wordsWa.map(word => word.trim());
+        //const userID = words.userID;
+        const userID = await getUserID();
 
         //Get all the text nodes in the table
         const table = problemsInfo.children[1];
         // console.log(table);
 
-        const problemNodes = table.children[3]
+        const problemNodes = table.children[3];
         // console.log(problemNodes.children);
 
         for (const problem of problemNodes.children) {
-            const title = problem.children[1].innerText.trim();
-            console.log("Title: " + title);
-            if (wordsToAc.length > 0 && wordsToAc.includes(title)) {
-                problem.style.backgroundColor = AcColor;
-            }
-            else if (wordsToWa.length > 0 && wordsToWa.includes(title)) {
-                problem.style.backgroundColor = WaColor;
-                addError(problem, userID);
-            }
-
-            if (BOLD) {
-                problem.children[0].style.fontWeight = "bold";
-                problem.children[1].style.fontWeight = "bold";
-            }
+            // Llamada asíncrona (se ejecutan en paralelo)
+            highlightProblemTitle(problem, userID);
         }
     }
     console.log("End of AeRForU");
 }
 
+async function highlightProblemTitle(problem, userID) {
+    const title = problem.children[1].innerText.trim();
+    // console.log("Title: " + title);
+    //if (wordsToAc.length > 0 && wordsToAc.includes(title)) {
+    if (await isAC(problem, userID)) {
+        problem.style.backgroundColor = AcColor;
+    }
+    //else if (wordsToWa.length > 0 && wordsToWa.includes(title)) {
+    else if (await isTried(problem, userID)) {
+        problem.style.backgroundColor = WaColor;
+        addError(problem, userID);
+    }
+
+    if (BOLD) {
+        problem.children[0].style.fontWeight = "bold";
+        problem.children[1].style.fontWeight = "bold";
+    }
+}
+
 async function addError(problem, userID) {
     // Get the problem ID
     const problemId = problem.children[0].innerText.trim();
-    console.log("Problem ID: " + problemId);
+    // console.log("Problem ID: " + problemId);
 
     // Get the last submission
     let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
@@ -226,62 +244,97 @@ async function addError(problem, userID) {
 
 }
 
-//Function to get the words to highlight
-async function getInfo() {
-    const wordsAc = [];
-    const wordsWa = [];
-
-    const userID = await getUserID();
-    finalUrl = "https://aceptaelreto.com/user/profile.php?id=${userID}";
-    finalUrl = finalUrl.replace("${userID}", userID);
-
-    //We need to webscrap the words to highlight
-    const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
-    url = baseSearchUrl.replace("${username}", username);
-    //console.log("URL: " + url);
-    //We need to make a request to the url
-    const request = await fetch(finalUrl);
-
-    const rText = await request.text();
-    // console.log(rText);
-
-    //Get the user ID
-    // const finalUrl = request.url;
-    // console.log("Final URL: " + finalUrl);
-    // const userID = finalUrl.split("id=")[1];
-    // console.log("User ID: " + userID);
-
-    async function fillWords(AC) {
-        //Filter with the regex ">something - something</a> (accepts anything)
-        //width if ac=true, bug if ac=false
-        const regex1 = new RegExp(`${AC ? "width" : "bug"} text-muted[^c]+>[0-9]+ - [^<]+<\/a>`, "gi"); //Only AC
-        const regex2 = new RegExp(">[0-9]+ - [^<]+</a>", "gi"); //Only the title part
-        //const regex = new RegExp(">[a-zA-Z0-9]+ - [a-zA-Z0-9 ]+</a>", "gi");
-        const matches1 = rText.match(regex1);
-        if (matches1 === null) return;
-        //Matches is matches1 that matches regex2
-        const matches = matches1.join("").match(regex2);
-        //console.log("Hey: " + matches);
-
-        words = matches.map(match => {
-            //Remove the > and </a>
-            return match.substring(7, match.length - 4);
+async function getUserID() {
+    let prevUsername = await new Promise((resolve) => {
+        chrome.storage.local.get("username", function (data) {
+            resolve(data.username);
         });
+    });
 
-        //wordsAc.push(...words);
-        (AC ? wordsAc : wordsWa).push(...words);
-        //Escape the regex characters
-        (AC ? wordsAc : wordsWa).forEach((word, index) => {
-            (AC ? wordsAc : wordsWa)[index] = word.replace(/\[\.\*\+\?\^\$\{\}\(\)\|\[\]\\]/g, '');
+    let userID;
+    if (prevUsername === username) {
+        userID = await new Promise((resolve) => {
+            chrome.storage.local.get("userID", function (data) {
+                resolve(data.userID);
+            });
         });
     }
-    await fillWords(true);
-    await fillWords(false);
+    else if (prevUsername !== undefined) {
+        console.log("New username: " + username);
+        const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
+        url = baseSearchUrl.replace("${username}", username);
+        
+        //We need to make a request to the url
+        const request = await fetch(url, {
+            method: 'HEAD',
+            redirect: 'follow'
+        });
 
-    console.log("Words to AC: " + wordsAc.length);
-    console.log("Words to WA: " + wordsWa.length);
+        //Get the user ID
+        const finalUrl = request.url;
+        // console.log("Final URL: " + finalUrl);
+        userID = finalUrl.split("id=")[1];
 
-    return { wordsAc, wordsWa, userID };
+        // Strore new username and userID in the storage
+        chrome.storage.local.set({ username: username });
+        chrome.storage.local.set({ userID: userID });
+    }
+    else {
+        console.log("No username found");
+        userID = false;
+    }
+
+    console.log("User ID: " + userID);
+    return userID;
+}
+
+async function isAC(problem, userID) {
+    // Get the problem ID
+    const problemId = problem.children[0].innerText.trim();
+    // console.log("Problem ID: " + problemId);
+
+    // Search for an AC submission
+    let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
+    problem_submissions_url = problem_submissions_url.replace("${userID}", userID);
+    problem_submissions_url = problem_submissions_url.replace("${problemId}", problemId);
+    
+    let request = await fetch(problem_submissions_url);
+    let submissions = await request.json();
+
+    do {
+        // Loop through the submissions and check for an AC submission
+        for (const submission of submissions.submission) {
+            if (submission.result === "AC") {
+                return true;
+            }
+        }
+
+        // If there are no next link (undefined), break the loop
+        if (submissions.nextLink === undefined) {
+            break;
+        }
+        console.log("Next link: " + submissions.nextLink);
+        // Get the next page of submissions
+        request = await fetch(submissions.nextLink);
+        submissions = await request.json();
+    } while (submissions.submission.length > 0); //If there are no submissions, break the loop
+    return false;
+}
+
+async function isTried(problem, userID) {
+    // Get the problem ID
+    const problemId = problem.children[0].innerText.trim();
+    // console.log("Problem ID: " + problemId);
+
+    // Search for an AC submission
+    let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
+    problem_submissions_url = problem_submissions_url.replace("${userID}", userID);
+    problem_submissions_url = problem_submissions_url.replace("${problemId}", problemId);
+    
+    const request = await fetch(problem_submissions_url);
+    const submissions = await request.json();
+
+    return submissions.submission.length !== 0;
 }
 
 async function getUserID() {
