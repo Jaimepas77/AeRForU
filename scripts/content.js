@@ -96,8 +96,8 @@ window.onload = async function () {
 async function highlightTitles() {
     console.log("Ini of AeRForU: highlighting problems")
     if (username !== false) {
-        let finalTable = document.getElementById("problemsInfo").children[1].children[3];
         try {
+            let finalTable = document.getElementById("problemsInfo").children[1].children[3];
             finalTable.children[0].children[1].innerText.trim(); // Intentar acceder a un elemento para verificar si la tabla está cargada
         }
         catch (error) {
