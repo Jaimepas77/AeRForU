@@ -336,3 +336,47 @@ async function isTried(problem, userID) {
 
     return submissions.submission.length !== 0;
 }
+
+async function getUserID() {
+    let prevUsername = await new Promise((resolve) => {
+        chrome.storage.local.get("username", function (data) {
+            resolve(data.username);
+        });
+    });
+
+    let userID;
+    if (prevUsername === username) {
+        userID = await new Promise((resolve) => {
+            chrome.storage.local.get("userID", function (data) {
+                resolve(data.userID);
+            });
+        });
+    }
+    else if (prevUsername !== undefined) {
+        console.log("New username: " + username);
+        const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
+        url = baseSearchUrl.replace("${username}", username);
+        
+        //We need to make a request to the url
+        const request = await fetch(url, {
+            method: 'HEAD',
+            redirect: 'follow'
+        });
+
+        //Get the user ID
+        const finalUrl = request.url;
+        // console.log("Final URL: " + finalUrl);
+        userID = finalUrl.split("id=")[1];
+
+        // Strore new username and userID in the storage
+        chrome.storage.local.set({ username: username });
+        chrome.storage.local.set({ userID: userID });
+    }
+    else {
+        console.log("No username found");
+        userID = false;
+    }
+
+    // console.log("User ID: " + userID);
+    return userID;
+}
