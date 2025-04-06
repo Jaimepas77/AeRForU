@@ -125,25 +125,30 @@ async function highlightTitles() {
         // console.log(problemNodes.children);
 
         for (const problem of problemNodes.children) {
-            const title = problem.children[1].innerText.trim();
-            // console.log("Title: " + title);
-            //if (wordsToAc.length > 0 && wordsToAc.includes(title)) {
-            if (await isAC(problem, userID)) {
-                problem.style.backgroundColor = AcColor;
-            }
-            //else if (wordsToWa.length > 0 && wordsToWa.includes(title)) {
-            else if (await isTried(problem, userID)) {
-                problem.style.backgroundColor = WaColor;
-                addError(problem, userID);
-            }
-
-            if (BOLD) {
-                problem.children[0].style.fontWeight = "bold";
-                problem.children[1].style.fontWeight = "bold";
-            }
+            // Llamada asíncrona (se ejecutan en paralelo)
+            highlightProblemTitle(problem, userID);
         }
     }
     console.log("End of AeRForU");
+}
+
+async function highlightProblemTitle(problem, userID) {
+    const title = problem.children[1].innerText.trim();
+    // console.log("Title: " + title);
+    //if (wordsToAc.length > 0 && wordsToAc.includes(title)) {
+    if (await isAC(problem, userID)) {
+        problem.style.backgroundColor = AcColor;
+    }
+    //else if (wordsToWa.length > 0 && wordsToWa.includes(title)) {
+    else if (await isTried(problem, userID)) {
+        problem.style.backgroundColor = WaColor;
+        addError(problem, userID);
+    }
+
+    if (BOLD) {
+        problem.children[0].style.fontWeight = "bold";
+        problem.children[1].style.fontWeight = "bold";
+    }
 }
 
 async function addError(problem, userID) {
