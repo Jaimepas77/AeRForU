@@ -67,13 +67,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 // });
 
 // Highlight the titles of the problems when the page is loaded
-window.onload = async function () {
-    if (window.location.href.includes("aceptaelreto.com/problems/")) { //Problems page
-        console.log("Problems page");
-        username = getUsername();
-        highlightTitles();
-    }
-};
+console.log("Problems page");
+username = getUsername();
+highlightTitles();
 
 async function highlightTitles() {
     console.log("Ini of AeRForU: highlighting problems")
