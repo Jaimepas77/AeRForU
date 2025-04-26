@@ -2,6 +2,34 @@
 let usersPage; //Source of the usernames and IDs
 let usersRanking; //The ranking table
 
+
+let HYPERLINK = true; //24en23 hyperlinks
+
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+    if (namespace === 'local') {
+        for (key in changes) {
+            if (key === 'hyperlinks') {
+                HYPERLINK = changes[key].newValue;
+                // console.log("HYPERLINK (changed): " + HYPERLINK);
+            }
+        }
+    }
+});
+
+chrome.storage.local.get(["hyperlinks"], function (data) {
+    if (data.hyperlinks !== undefined) {
+        HYPERLINK = data.hyperlinks;
+        // console.log("HYPERLINK (storage): " + HYPERLINK);
+    }
+    else {
+        chrome.storage.local.set({ hyperlinks: HYPERLINK });
+        // console.log("HYPERLINK (default): " + HYPERLINK);
+    }
+    if (HYPERLINK) {   
+        initHyperlinks();
+    }
+});
+
 // Observe the body for changes in the ranking
 const observer = new MutationObserver(mutations => {
     mutations.forEach(async mutation => {

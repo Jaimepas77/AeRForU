@@ -16,8 +16,7 @@ function getUsername() {
 let AcColor = "#f2fff2";//light green
 let WaColor = "#ffe6e6";//light red
 let BOLD = true;
-let HYPERLINK = true; //24en23 hyperlinks
-chrome.storage.local.get(["BOLD", "AcColor", "WaColor", "hyperlinks"], function (data) {
+chrome.storage.local.get(["BOLD", "AcColor", "WaColor"], function (data) {
     if (data.BOLD !== undefined) {
         BOLD = data.BOLD;
     }
@@ -36,16 +35,9 @@ chrome.storage.local.get(["BOLD", "AcColor", "WaColor", "hyperlinks"], function 
     else {
         chrome.storage.local.set({ WaColor: WaColor });
     }
-    if (data.hyperlinks !== undefined) {
-        HYPERLINK = data.hyperlinks;
-    }
-    else {
-        chrome.storage.local.set({ hyperlinks: HYPERLINK });
-    }
     // console.log("BOLD: " + BOLD);
     // console.log("AcColor: " + AcColor);
     // console.log("WaColor: " + WaColor);
-    // console.log("HYPERLINK: " + HYPERLINK);
 });
 
 chrome.storage.onChanged.addListener(function (changes, namespace) {
@@ -59,9 +51,6 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
             }
             else if (key === 'WaColor') {
                 WaColor = changes[key].newValue;
-            }
-            else if (key === 'hyperlinks') {
-                HYPERLINK = changes[key].newValue;
             }
         }
     }
@@ -83,13 +72,6 @@ window.onload = async function () {
         console.log("Problems page");
         username = getUsername();
         highlightTitles();
-    }
-    else if (window.location.href.includes("aceptaelreto.com/24en23")
-                && window.location.href.includes("/clasificacion.php")
-                && HYPERLINK) { //24en23 page
-        console.log("24en23 page");
-        // addHyperlinks();
-        initHyperlinks();
     }
 };
 
