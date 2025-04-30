@@ -5,6 +5,7 @@ let username = "";
 function getUsername() {
     const icon = document.getElementsByClassName("icon icon-user")[0];
     const username = icon.parentNode.textContent.trim();
+    // const username = "apereza"; //Testing
     if (username === "Login") {
         return false;
     }
@@ -93,7 +94,7 @@ async function highlightTitles() {
         //const wordsToAc = words.wordsAc.map(word => word.trim());
         //const wordsToWa = words.wordsWa.map(word => word.trim());
         //const userID = words.userID;
-        const userID = await getUserID();
+        const userID = await updateUserID(username);
 
         //Get all the text nodes in the table
         const table = problemsInfo.children[1];
@@ -112,13 +113,14 @@ async function highlightTitles() {
 
 async function highlightProblemTitle(problem, userID) {
     const title = problem.children[1].innerText.trim();
+    const problemId = problem.children[0].innerText.trim();
     // console.log("Title: " + title);
     //if (wordsToAc.length > 0 && wordsToAc.includes(title)) {
-    if (await isAC(problem, userID)) {
+    if (await isAC(problemId, userID)) {
         problem.style.backgroundColor = AcColor;
     }
     //else if (wordsToWa.length > 0 && wordsToWa.includes(title)) {
-    else if (await isTried(problem, userID)) {
+    else if (await isTried(problemId, userID)) {
         problem.style.backgroundColor = WaColor;
         addError(problem, userID);
     }
@@ -222,7 +224,7 @@ async function addError(problem, userID) {
 
 }
 
-async function getUserID() {
+async function updateUserID(username) {
     let prevUsername = await new Promise((resolve) => {
         chrome.storage.local.get("username", function (data) {
             resolve(data.username);
@@ -237,23 +239,10 @@ async function getUserID() {
             });
         });
     }
-    else if (prevUsername !== undefined) {
-        console.log("New username: " + username);
-        const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
-        url = baseSearchUrl.replace("${username}", username);
-        
-        //We need to make a request to the url
-        const request = await fetch(url, {
-            method: 'HEAD',
-            redirect: 'follow'
-        });
+    else if (username !== undefined) {
+        userID = await getUserID(username);
 
-        //Get the user ID
-        const finalUrl = request.url;
-        // console.log("Final URL: " + finalUrl);
-        userID = finalUrl.split("id=")[1];
-
-        // Strore new username and userID in the storage
+        // Store new username and userID in the storage
         chrome.storage.local.set({ username: username });
         chrome.storage.local.set({ userID: userID });
     }
@@ -262,99 +251,7 @@ async function getUserID() {
         userID = false;
     }
 
-    console.log("User ID: " + userID);
+    //console.log("User ID: " + userID);
     return userID;
 }
 
-async function isAC(problem, userID) {
-    // Get the problem ID
-    const problemId = problem.children[0].innerText.trim();
-    // console.log("Problem ID: " + problemId);
-
-    // Search for an AC submission
-    let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
-    problem_submissions_url = problem_submissions_url.replace("${userID}", userID);
-    problem_submissions_url = problem_submissions_url.replace("${problemId}", problemId);
-    
-    let request = await fetch(problem_submissions_url);
-    let submissions = await request.json();
-
-    do {
-        // Loop through the submissions and check for an AC submission
-        for (const submission of submissions.submission) {
-            if (submission.result === "AC") {
-                return true;
-            }
-        }
-
-        // If there are no next link (undefined), break the loop
-        if (submissions.nextLink === undefined) {
-            break;
-        }
-        console.log("Next link: " + submissions.nextLink);
-        // Get the next page of submissions
-        request = await fetch(submissions.nextLink);
-        submissions = await request.json();
-    } while (submissions.submission.length > 0); //If there are no submissions, break the loop
-    return false;
-}
-
-async function isTried(problem, userID) {
-    // Get the problem ID
-    const problemId = problem.children[0].innerText.trim();
-    // console.log("Problem ID: " + problemId);
-
-    // Search for an AC submission
-    let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
-    problem_submissions_url = problem_submissions_url.replace("${userID}", userID);
-    problem_submissions_url = problem_submissions_url.replace("${problemId}", problemId);
-    
-    const request = await fetch(problem_submissions_url);
-    const submissions = await request.json();
-
-    return submissions.submission.length !== 0;
-}
-
-async function getUserID() {
-    let prevUsername = await new Promise((resolve) => {
-        chrome.storage.local.get("username", function (data) {
-            resolve(data.username);
-        });
-    });
-
-    let userID;
-    if (prevUsername === username) {
-        userID = await new Promise((resolve) => {
-            chrome.storage.local.get("userID", function (data) {
-                resolve(data.userID);
-            });
-        });
-    }
-    else if (prevUsername !== undefined) {
-        console.log("New username: " + username);
-        const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
-        url = baseSearchUrl.replace("${username}", username);
-        
-        //We need to make a request to the url
-        const request = await fetch(url, {
-            method: 'HEAD',
-            redirect: 'follow'
-        });
-
-        //Get the user ID
-        const finalUrl = request.url;
-        // console.log("Final URL: " + finalUrl);
-        userID = finalUrl.split("id=")[1];
-
-        // Strore new username and userID in the storage
-        chrome.storage.local.set({ username: username });
-        chrome.storage.local.set({ userID: userID });
-    }
-    else {
-        console.log("No username found");
-        userID = false;
-    }
-
-    // console.log("User ID: " + userID);
-    return userID;
-}

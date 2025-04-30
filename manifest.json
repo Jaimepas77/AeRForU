@@ -16,7 +16,8 @@
     "content_scripts": [
         {
             "js": [
-            "scripts/content.js"
+            "scripts/content.js",
+            "scripts/getters.js"
             ],
             "matches": [
             "*://aceptaelreto.com/problems/*"
