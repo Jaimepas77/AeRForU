@@ -1,18 +1,3 @@
-//First we need to get the username
-let username = "";
-
-//Function to get the username
-function getUsername() {
-    const icon = document.getElementsByClassName("icon icon-user")[0];
-    const username = icon.parentNode.textContent.trim();
-    // const username = "apereza"; //Testing
-    if (username === "Login") {
-        return false;
-    }
-    console.log("Username: " + username);
-    return username;
-}
-
 // Settings
 let AcColor = "#f2fff2";//light green
 let WaColor = "#ffe6e6";//light red
@@ -69,10 +54,22 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 
 // Highlight the titles of the problems when the page is loaded
 console.log("Problems page");
-username = getUsername();
-highlightTitles();
+let username = getUsername();
+highlightTitles(username);
 
-async function highlightTitles() {
+//Function to get the username
+function getUsername() {
+    const icon = document.getElementsByClassName("icon icon-user")[0];
+    const username = icon.parentNode.textContent.trim();
+    // const username = "apereza"; //Testing
+    if (username === "Login") {
+        return false;
+    }
+    console.log("Username: " + username);
+    return username;
+}
+
+async function highlightTitles(username) {
     console.log("Ini of AeRForU: highlighting problems")
     if (username !== false) {
         try {
@@ -81,7 +78,7 @@ async function highlightTitles() {
         }
         catch (error) {
             console.log("Table not found yet, waiting...");
-            setTimeout(highlightTitles, 100);
+            setTimeout(highlightTitles, 100, username);
             return;
         }
 
@@ -136,15 +133,7 @@ async function addError(problem, userID) {
     const problemId = problem.children[0].innerText.trim();
     // console.log("Problem ID: " + problemId);
 
-    // Get the last submission
-    let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
-    problem_submissions_url = problem_submissions_url.replace("${userID}", userID);
-    problem_submissions_url = problem_submissions_url.replace("${problemId}", problemId);
-
-    const request = await fetch(problem_submissions_url);
-    const submissions = await request.json();
-    // console.log(submissions.submission[0].result);
-    let result = submissions.submission[0].result;
+    let result = await getLastError(problemId, userID);
     let link = "https://aceptaelreto.com/doc/verdicts.php";
 
     // Add the error message

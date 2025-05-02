@@ -58,8 +58,20 @@ async function getUserID(username) {
     return userID;
 }
 
+async function getLastError(problemId, userID) {
+    // Get the last submission
+    let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
+    problem_submissions_url = problem_submissions_url.replace("${userID}", userID);
+    problem_submissions_url = problem_submissions_url.replace("${problemId}", problemId);
+
+    const request = await fetch(problem_submissions_url);
+    const submissions = await request.json();
+    // console.log(submissions.submission[0].result);
+    return submissions.submission[0].result;
+}
+
 try {
-    module.exports = { isAC, isTried, getUserID };
+    module.exports = { isAC, isTried, getUserID, getLastError };
 }
 catch (e) {
     // Do nothing, this is for testing purposes

@@ -1,4 +1,4 @@
-const { isAC, isTried, getUserID } = require('./getters');
+const { isAC, isTried, getUserID, getLastError } = require('./getters');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
     const ret = await isAC(200, 17715);
@@ -23,4 +23,9 @@ test('isTried: problem 332 of elferni', async () => {
 test('getUserID: jjjjjjjp022', async () => {
     const ret = await getUserID("jjjjjjjp022");
     expect(ret).toBe('17715');
+});
+
+test('getLastError: problem 331 of elferni', async () => {
+    const ret = await getLastError(331, 8);
+    expect(ret).toBe('WA');
 });
