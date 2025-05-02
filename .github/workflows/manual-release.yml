@@ -18,16 +18,16 @@ jobs:
     - run: npm install
     - run: npm test
 
-    - name: Create Chrome Extension ZIP
+    - name: Create AeRForU ZIP
       run: |
         mkdir build
-        zip -r build/chrome-extension.zip popup images scripts manifest.json README.md
+        zip -r build/AeRForU.zip popup images scripts manifest.json README.md
 
     - name: Upload release asset
       uses: softprops/action-gh-release@v2
       with:
         tag_name: v1.0.${{ github.run_number }}
-        name: Chrome Extension Build ${{ github.run_number }}
-        files: build/chrome-extension.zip
+        name: AeRForU Build ${{ github.run_number }}
+        files: build/AeRForU.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
