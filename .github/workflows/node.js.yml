@@ -44,5 +44,3 @@ jobs:
       with:
         name: chrome-extension
         path: build/chrome-extension.zip
-        name: chrome-extension
-        path: build/chrome-extension.zip
