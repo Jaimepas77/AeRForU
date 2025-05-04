@@ -56,23 +56,29 @@ async function getUsers() {
 async function initHyperlinks() {
     usersRanking = document.getElementsByClassName("card-body")[0];
 
-    const table = usersRanking.children[2];
-    // console.log(table);
+    try {
+        const table = usersRanking.children[2];
+        // console.log(table);
 
-    const userNodes = table.children[1];
-    // console.log(userNodes.children[0]);
+        const userNodes = table.children[1];
+        // console.log(userNodes.children[0]);
 
-    while (userNodes.children.length == 0) { //Wait for full loading
-        // Check every 100ms
-        await new Promise(resolve => setTimeout(resolve, 100));
+        while (userNodes.children.length == 0) { //Wait for full loading
+            // Check every 100ms
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        await addHyperlinks();
+
+        observer.observe(userNodes, {
+            childList: true,
+            subtree: true
+        });
     }
-
-    await addHyperlinks();
-
-    observer.observe(userNodes, {
-        childList: true,
-        subtree: true
-    });
+    catch (error) {
+        console.error("Error in initHyperlinks: ", error, "retrying...");
+        setTimeout(initHyperlinks, 100);
+    }
 }
 
 async function addHyperlinks() {
