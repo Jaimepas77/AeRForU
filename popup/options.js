@@ -68,8 +68,15 @@ async function loadOptions() {
     // Initialize the form with the user's option settings
     const data = await chrome.storage.local.get(["BOLD", "AcColor", "WaColor", "hyperlinks"]);
     optionsForm.bold.checked = Boolean(data.BOLD);
-    optionsForm.AcColor.value = data.AcColor;
-    optionsForm.WaColor.value = data.WaColor;
+    if (data.AcColor === undefined || data.WaColor === undefined) {
+        optionsForm.AcColor.value = "#d4edda"; // light green
+        optionsForm.WaColor.value = "#ffe6e6"; // light red
+        //chrome.storage.local.set({ AcColor: optionsForm.AcColor.value, WaColor: optionsForm.WaColor.value });
+    }
+    else {
+        optionsForm.AcColor.value = data.AcColor;
+        optionsForm.WaColor.value = data.WaColor;
+    }
     optionsForm24en23.hyperlinks.checked = Boolean(data.hyperlinks);
 }
 
