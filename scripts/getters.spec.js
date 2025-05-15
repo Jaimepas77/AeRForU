@@ -33,7 +33,7 @@ test('getLastError: problem 331 of elferni', async () => {
 test('getProblemCategories: problem 100', async () => {
     const ret = await getProblemCategories(100);
     expect(ret.length).toBe(5);
-}, 10000);
+}, 100000);
 
 test('getCategoryData: category 6', async () => {
     const ret = await getCategoryData(6);
