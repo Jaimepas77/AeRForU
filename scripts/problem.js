@@ -1,6 +1,45 @@
-async function insertCategories() {
+async function updateCategories() {
     let problemId = parseInt(await getProblemId());
-    let categories = await getProblemCategories(problemId);
+
+    // Load cached categories
+    let problem_categories = await new Promise((resolve) => {
+        chrome.storage.local.get("problemCategories", function (data) {
+            resolve(data.problemCategories);
+        });
+    });
+    // console.log("Categories from storage: ", problem_categories);
+
+    // Update categories
+    let categories = [];
+    let new_categories = getProblemCategories(problemId);
+    if (problem_categories !== undefined && problem_categories[problemId] !== undefined) { // If categories are found in storage
+        // console.log("Categories from storage: ", problem_categories);
+        categories = problem_categories[problemId];
+
+        insertCategories(categories);
+    }
+    else { // If categories are not found in storage
+        // console.log("No categories found in storage");
+        // If no categories are found, create a new Map
+        if (problem_categories === undefined) {
+            problem_categories = new Map();
+        }
+        categories = await new_categories;
+        // console.log("Categories from API: ", categories);
+        problem_categories[problemId] = categories;
+        
+        insertCategories(categories);
+    }
+
+    if (await new_categories.length !== categories.length) {
+        // Update categories in storage
+        problem_categories[problemId] = await new_categories;
+        // console.log("Updating categories in storage: ", problem_categories);
+        chrome.storage.local.set({ problemCategories: problem_categories });
+    }
+}
+
+async function insertCategories(categories) {
     let categories_data = [];
     for (let i = 0; i < categories.length; i++) {
         let cat = await getCategoryData(categories[i]);
@@ -81,4 +120,4 @@ async function getProblemId() {
     return problemId;
 }
 
-insertCategories();
+updateCategories();
