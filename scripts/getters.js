@@ -40,7 +40,7 @@ async function isTried(problemId, userID) {
 }
 
 async function getUserID(username) {
-    console.log("New username: " + username);
+    // console.log("New username: " + username);
     const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
     url = baseSearchUrl.replace("${username}", username);
     
@@ -70,8 +70,50 @@ async function getLastError(problemId, userID) {
     return submissions.submission[0].result;
 }
 
+async function getProblemCategories(problemId) {
+    let category_problems_url = "https://aceptaelreto.com/ws/cat/${categoryId}/problems";
+    let contained_categories = [];
+
+    // Scan the categories (start from 2, stop when null returned)
+    let categoryId = 2;
+    let problem_list = null;
+
+    let not_found_counter = 0;
+    while(not_found_counter < 10) {
+        // Get the problems in the category
+        request = await fetch(category_problems_url.replace("${categoryId}", categoryId));
+        if (request.status === 404) {
+            // console.log("Category not found: " + categoryId);
+            not_found_counter++;
+            categoryId++;
+            continue;
+        }
+        problem_list = await request.json();
+        // console.log("Problems: " + problem_list.problem.length);
+
+        // Add the category to the list if the preblemId is in the list of problems
+        if (problem_list.problem.some(elem => elem.num === problemId)) {
+            contained_categories.push(categoryId);
+        }
+        
+        // Increment the category ID
+        categoryId++;
+    }
+    // console.log("Contained categories: " + contained_categories);
+    return contained_categories;
+}
+
+async function getCategoryData(categoryId) {
+    let category_name_url = "https://aceptaelreto.com/ws/cat/${categoryId}";
+    category_name_url = category_name_url.replace("${categoryId}", categoryId);
+    const request = await fetch(category_name_url);
+    const category_data = await request.json();
+    // console.log("Category data: " + category_data.name);
+    return category_data;
+}
+
 try {
-    module.exports = { isAC, isTried, getUserID, getLastError };
+    module.exports = { isAC, isTried, getUserID, getLastError, getProblemCategories, getCategoryData };
 }
 catch (e) {
     // Do nothing, this is for testing purposes

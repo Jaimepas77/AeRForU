@@ -1,4 +1,4 @@
-const { isAC, isTried, getUserID, getLastError } = require('./getters');
+const { isAC, isTried, getUserID, getLastError, getProblemCategories, getCategoryData } = require('./getters');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
     const ret = await isAC(200, 17715);
@@ -28,4 +28,15 @@ test('getUserID: jjjjjjjp022', async () => {
 test('getLastError: problem 331 of elferni', async () => {
     const ret = await getLastError(331, 8);
     expect(ret).toBe('WA');
+});
+
+test('getProblemCategories: problem 100', async () => {
+    const ret = await getProblemCategories(100);
+    expect(ret.length).toBe(5);
+}, 100000);
+
+test('getCategoryData: category 6', async () => {
+    const ret = await getCategoryData(6);
+    expect(ret.name).toBe('Bucles simples');
+    expect(ret.desc).toBe('for\'s, while\'s o do-while\'s sin anidamiento.');
 });
