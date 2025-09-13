@@ -238,9 +238,11 @@ async function updateUserID(username) {
         if (userID === undefined) {
             userID = false; // Hardcode your user ID
         }
-        // Store new username and userID in the storage
-        chrome.storage.local.set({ username: username });
-        chrome.storage.local.set({ userID: userID });
+        else {
+            // Store new username and userID in the storage
+            chrome.storage.local.set({ username: username });
+            chrome.storage.local.set({ userID: userID });
+        }
     }
     else {
         console.log("No username found");
