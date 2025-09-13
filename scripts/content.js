@@ -92,6 +92,10 @@ async function highlightTitles(username) {
         //const wordsToWa = words.wordsWa.map(word => word.trim());
         //const userID = words.userID;
         const userID = await updateUserID(username);
+        if (userID === false) {
+            console.log("No userID found for username " + username);
+            return;
+        }
 
         //Get all the text nodes in the table
         const table = problemsInfo.children[1];
@@ -231,6 +235,9 @@ async function updateUserID(username) {
     else if (username !== undefined) {
         userID = await getUserID(username);
 
+        if (userID === undefined) {
+            userID = false; // Hardcode your user ID
+        }
         // Store new username and userID in the storage
         chrome.storage.local.set({ username: username });
         chrome.storage.local.set({ userID: userID });
