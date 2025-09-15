@@ -13,6 +13,9 @@
         },
         "default_title": "AeRForU"
     },
+    "background": {
+        "service_worker": "scripts/background.js"
+    },
     "content_scripts": [
         {
             "js": [
@@ -42,6 +45,10 @@
         }
     ],
     "permissions": [
-        "storage"
+        "storage",
+        "cookies"
+    ],
+    "host_permissions": [
+        "*://aceptaelreto.com/*"
     ]
 }

@@ -53,9 +53,42 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 // });
 
 // Highlight the titles of the problems when the page is loaded
-console.log("Problems page");
-let username = getUsername();
-highlightTitles(username);
+(async function() {
+    console.log("Problems page");
+    let username = getUsername();
+    const userID = await updateUserID(username);
+
+    // Retrieve the userID from the remember me cookie if possible
+    const cookieName = "ACR_RememberMe";
+    const pageUrl = window.location.href;
+
+    if (userID === false) {
+        console.log("No userID found for username " + username + ", trying to get it from the cookie");
+
+        // Send message to background to request the cookie value.
+        chrome.runtime.sendMessage(
+            { type: "GET_COOKIE", url: pageUrl, name: cookieName },
+            async (response) => {
+                // If response is undefined and chrome.runtime.lastError exists,
+                // the extension or background might not be reachable.
+                if (chrome.runtime.lastError) {
+                    console.log("Error getting cookie: " + chrome.runtime.lastError.message);
+                    return;
+                }
+
+                if (response && response.success) {
+                    console.log("Cookie value: " + response.value);
+                    highlightTitles(await updateUserID(response.value));
+                } else {
+                    console.log("Error getting cookie: " + (response ? response.error : "No response"));
+                }
+            }
+        );
+        return;
+    }
+
+    highlightTitles(userID);
+})();
 
 //Function to get the username
 function getUsername() {
@@ -69,16 +102,16 @@ function getUsername() {
     return username;
 }
 
-async function highlightTitles(username) {
+async function highlightTitles(userID) {
     console.log("Ini of AeRForU: highlighting problems")
-    if (username !== false) {
+    if (userID !== false) {
         try {
             let finalTable = document.getElementById("problemsInfo").children[1].children[3];
             finalTable.children[0].children[1].innerText.trim(); // Intentar acceder a un elemento para verificar si la tabla está cargada
         }
         catch (error) {
             console.log("Table not found yet, waiting...");
-            setTimeout(highlightTitles, 100, username);
+            setTimeout(highlightTitles, 100, userID);
             return;
         }
 
@@ -91,11 +124,6 @@ async function highlightTitles(username) {
         //const wordsToAc = words.wordsAc.map(word => word.trim());
         //const wordsToWa = words.wordsWa.map(word => word.trim());
         //const userID = words.userID;
-        const userID = await updateUserID(username);
-        if (userID === false) {
-            console.log("No userID found for username " + username);
-            return;
-        }
 
         //Get all the text nodes in the table
         const table = problemsInfo.children[1];
