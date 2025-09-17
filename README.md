@@ -4,7 +4,7 @@ Funciona en todos aquellos navegadores que estén basados en Chromium (como Goog
 El objetivo de la extensión es proporcionar funcionalidades adicionales sobre la plataforma, mejorando la experiencia de usuario.
 
 Actualmente se ofrecen las siguientes funcionalidades:
-- Marcado de problemas resueltos e intentados en [la lista de problemas](https://aceptaelreto.com/problems/volumes.php/?vol=71). Es necesario iniciar sesión.
+- Marcado de problemas resueltos e intentados en [la lista de problemas](https://aceptaelreto.com/problems/volumes.php/?vol=71).
 - Inclusión de un desplegable con categorías asociadas a un problema en [su página del enunciado](https://aceptaelreto.com/problem/statement.php?id=116).
 - Inclusión de hiperenlaces en los usuarios en [el ranking del concurso 24 en 23](https://aceptaelreto.com/24en23/2025/clasificacion.php).
 
