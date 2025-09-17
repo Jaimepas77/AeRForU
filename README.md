@@ -1,6 +1,12 @@
 # AeRForU
-Acepta el Reto for u es una extensión de Google Chrome para la plataforma de [aceptaelreto.com](https://aceptaelreto.com).
-El objetivo de la extensión es permitir al usuario diferenciar los problemas resueltos de los no resueltos en las listas de problemas.
+Acepta el Reto for u es una extensión de navegador para la plataforma de [aceptaelreto.com](https://aceptaelreto.com).
+Funciona en todos aquellos navegadores que estén basados en Chromium (como Google Chrome, Edge, Brave y Opera entre otros).
+El objetivo de la extensión es proporcionar funcionalidades adicionales sobre la plataforma, mejorando la experiencia de usuario.
+
+Actualmente se ofrecen las siguientes funcionalidades:
+- Marcado de problemas resueltos e intentados en [la lista de problemas](https://aceptaelreto.com/problems/volumes.php/?vol=71). Es necesario iniciar sesión.
+- Inclusión de un desplegable con categorías asociadas a un problema en [su página del enunciado](https://aceptaelreto.com/problem/statement.php?id=116).
+- Inclusión de hiperenlaces en los usuarios en [el ranking del concurso 24 en 23](https://aceptaelreto.com/24en23/2025/clasificacion.php).
 
 ## Aspecto visual
 A continuación se muestra un ejemplo de cómo se diferencian los problemas realizados correctamente (en verde),
@@ -9,9 +15,7 @@ los que tienen envíos incorrectos (en rojo) y los que no se han intentado aún 
 
 ## Instalación
 ### Google Chrome
-1. Clona el repositorio en tu ordenador. Utiliza `git clone https://github.com/Jaimepas77/AeRForU.git` para
-descargarlo por línea de comandos
-o si no descarga el zip del proyecto y descomprímelo.
+1. Descarga el zip del proyecto y descomprímelo.
 ![Ejemplo de descargar como zip](/images/step1.jpg)
 
 2. En el navegador de Google Chrome, introduce `chrome://extensions`. En esta
