@@ -11,7 +11,7 @@
         <h1 class="title">Welcome to AeRForU!</h1>
 
         <h2 class="section-title">Problem List Settings</h2>
-        <form id="optionsForm" class="settings-form">
+        <form id="optionsFormList" class="settings-form">
             <div class="setting-item">
                 <label for="bold" class="setting-label">Enable bold text</label>
                 <label class="switch">
@@ -45,8 +45,18 @@
                 </label>
             </div>
         </form>
+
+        <h2 class="section-title">Download Problems</h2>
+        <form id="optionsFormDownload" class="settings-form">
+            <div class="setting-item">
+                <input type="button" name="Download" id="Download" value="Download Problems" class="download-btn">
+            </div>
+        </form>
     </div>
 
     <script defer src="options.js" type="module"></script>
+    <script src="../lib/jszip.min.js"></script>
+    <script type="module" src="download.js"></script>
+
 </body>
 </html>

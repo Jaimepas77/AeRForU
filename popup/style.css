@@ -143,7 +143,7 @@ input:checked + .slider:before {
 .reset-btn {
     width: 100%;
     padding: 0.5rem;
-    background-color: #f44336;
+    background-color: #f34337;
     color: white;
     border: none;
     border-radius: 6px;
@@ -153,5 +153,21 @@ input:checked + .slider:before {
 }
 
 .reset-btn:hover {
-    background-color: #d32f2f;
+    background-color: #bd2b2b;
+}
+
+.download-btn {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #4b73f7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.download-btn:hover {
+    background-color: #375ad1;
 }
