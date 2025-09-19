@@ -42,7 +42,7 @@ async function isTried(problemId, userID) {
 async function getUserID(username) {
     // console.log("New username: " + username);
     const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
-    url = baseSearchUrl.replace("${username}", username);
+    let url = baseSearchUrl.replace("${username}", username);
     
     //We need to make a request to the url
     const request = await fetch(url, {
@@ -53,7 +53,7 @@ async function getUserID(username) {
     //Get the user ID
     const finalUrl = request.url;
     // console.log("Final URL: " + finalUrl);
-    userID = finalUrl.split("id=")[1];
+    let userID = finalUrl.split("id=")[1];
 
     return userID;
 }
