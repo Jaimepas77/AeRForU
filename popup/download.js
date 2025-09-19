@@ -251,6 +251,25 @@ async function updateUserID(username) {
   return userID;
 }
 
+async function getUserID(username) {
+    // console.log("New username: " + username);
+    const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
+    url = baseSearchUrl.replace("${username}", username);
+    
+    //We need to make a request to the url
+    const request = await fetch(url, {
+        method: 'HEAD',
+        redirect: 'follow'
+    });
+
+    //Get the user ID
+    const finalUrl = request.url;
+    // console.log("Final URL: " + finalUrl);
+    userID = finalUrl.split("id=")[1];
+
+    return userID;
+}
+
 async function getSubmissionCode(submissionId, userKey) {
   let submission_code_url = "https://aceptaelreto.com/ws/submission/${submissionId}/code";
   submission_code_url = submission_code_url.replace("${submissionId}", submissionId);
