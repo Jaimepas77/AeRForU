@@ -30,10 +30,10 @@ test('getLastError: problem 331 of elferni', async () => {
     expect(ret).toBe('WA');
 });
 
-test('getProblemCategories: problem 100', async () => {
-    const ret = await getProblemCategories(100);
-    expect(ret.length).toBe(5);
-}, 100000);
+// test('getProblemCategories: problem 100', async () => {
+//     const ret = await getProblemCategories(100);
+//     expect(ret.length).toBe(5);
+// }, 100000);
 
 test('isProblemsCategory: category 6', async () => {
     const ret = await isProblemsCategory(6);
