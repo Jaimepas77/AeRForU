@@ -20,7 +20,8 @@
         {
             "js": [
                 "scripts/getters.js",
-                "scripts/content.js"
+                "scripts/content.js",
+                "scripts/update.js"
             ],
             "matches": [
                 "*://aceptaelreto.com/problems/*"
@@ -41,6 +42,14 @@
             ],
             "matches": [
                 "*://aceptaelreto.com/24en23/*/clasificacion.php"
+            ]
+        },
+        {
+            "js": [
+                "scripts/update.js"
+            ],
+            "matches": [
+                "*://aceptaelreto.com/"
             ]
         }
     ],

@@ -88,4 +88,28 @@ async function loadOptions() {
     optionsForm24en23.hyperlinks.checked = Boolean(data.hyperlinks);
 }
 
+async function checkVersion() {
+    const manifest = chrome.runtime.getManifest();
+    const currentVersion = manifest.version;
+    
+    //https://raw.githubusercontent.com/Jaimepas77/AeRForU/refs/heads/main/manifest.json
+    const response = await fetch('https://raw.githubusercontent.com/Jaimepas77/AeRForU/refs/heads/main/manifest.json', { cache: 'no-store' });
+    if (response.ok) {
+        const latestManifest = await response.json();
+        const latestVersion = latestManifest.version;
+
+        if (currentVersion !== latestVersion) {
+            // Notify the user about the new version
+            console.log(`New version available: ${latestVersion}`);
+            const notification = document.getElementById('version-notification');
+            notification.classList.remove('hidden');
+            const closeButton = document.getElementById('close-notification');
+            closeButton.addEventListener('click', () => {
+                notification.classList.add('hidden');
+            });
+        }
+    }
+}
+
 loadOptions();
+checkVersion();
