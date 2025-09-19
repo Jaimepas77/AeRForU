@@ -10,9 +10,8 @@ Actualmente se ofrecen las siguientes funcionalidades:
 - Descarga del código asociado a todos los problemas que se hallan enviado con resultado AC.
 
 ## Aspecto visual
-A continuación se muestra un ejemplo de cómo se diferencian los problemas realizados correctamente (en verde),
-los que tienen envíos incorrectos (en rojo) y los que no se han intentado aún (sin colorear). Además, en los problemas intentados sin éxito, se puede ver el tipo de error que se tiene en el último envío realizado.
-![Ejemplo del plugin sobre los problemas de Las 12 uvas (2023)](/images/example2.jpg)
+A continuación se incluyen algunas capturas de pantalla de las funcionalidades del plugin.
+![Ejemplo del plugin sobre los problemas de Las 12 uvas (2023)](/images/example3.png)
 
 ## Instalación
 ### Google Chrome
