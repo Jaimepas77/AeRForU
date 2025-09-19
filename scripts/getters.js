@@ -74,32 +74,28 @@ async function getProblemCategories(problemId) {
     let category_problems_url = "https://aceptaelreto.com/ws/cat/${categoryId}/problems";
     let contained_categories = [];
 
-    // Scan the categories (start from 2, stop when null returned)
-    let categoryId = 2;
-    let problem_list = null;
+    let category_info_url = "https://aceptaelreto.com/ws/cat/all";
 
-    let not_found_counter = 0;
-    while(not_found_counter < 10) {
-        // Get the problems in the category
-        request = await fetch(category_problems_url.replace("${categoryId}", categoryId));
-        if (request.status === 404) {
-            // console.log("Category not found: " + categoryId);
-            not_found_counter++;
-            categoryId++;
-            continue;
-        }
-        problem_list = await request.json();
-        // console.log("Problems: " + problem_list.problem.length);
+    // Scan the categories
+    // Fetch all categories' metadata
+    const all_categories_request = await fetch(category_info_url);
+    const all_categories = await all_categories_request.json();
 
-        // Add the category to the list if the preblemId is in the list of problems
-        if (problem_list.problem.some(elem => elem.num === problemId)) {
-            contained_categories.push(categoryId);
+    // Filter for categories that actually contain problems
+    const relevant_categories = all_categories.filter(cat => cat.numOfProblems > 0);
+
+    // Check each relevant category for the problem
+    const categoryChecks = relevant_categories.map(async (category) => {
+        const request = await fetch(category_problems_url.replace("${categoryId}", category.id));
+        const problem_list = await request.json();
+        if (problem_list.problem && problem_list.problem.some(elem => elem.num === problemId)) {
+            return category.id;
         }
-        
-        // Increment the category ID
-        categoryId++;
-    }
-    // console.log("Contained categories: " + contained_categories);
+        return null;
+    });
+
+    const results = await Promise.all(categoryChecks);
+    contained_categories = results.filter(id => id !== null);
     return contained_categories;
 }
 
