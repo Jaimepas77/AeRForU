@@ -289,21 +289,3 @@ async function updateUserID(username) {
     //console.log("User ID: " + userID);
     return userID;
 }
-
-
-async function checkVersion() {
-    const manifest = chrome.runtime.getManifest();
-    const currentVersion = manifest.version;
-    
-    //https://raw.githubusercontent.com/Jaimepas77/AeRForU/refs/heads/main/manifest.json
-    const response = await fetch('https://raw.githubusercontent.com/Jaimepas77/AeRForU/refs/heads/main/manifest.json', { cache: 'no-store' });
-    if (response.ok) {
-        const latestManifest = await response.json();
-        const latestVersion = latestManifest.version;
-
-        if (currentVersion !== latestVersion) {
-            // Notify the user about the new version
-            console.log(`New version available: ${latestVersion}`);
-        }
-    }
-}
