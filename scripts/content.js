@@ -87,7 +87,16 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         return;
     }
 
-    highlightTitles(userID);
+    // Check if url contains cat=n or vol=n
+    const urlParams = new URLSearchParams(window.location.search);
+    const catParam = urlParams.get('cat');
+    const volParam = urlParams.get('vol');
+    console.log("catParam: " + catParam);
+    console.log("volParam: " + volParam);
+    if ((catParam !== null && await isProblemsCategory(catParam)) || volParam !== null) {
+        highlightTitles(userID);
+    }
+
 })();
 
 //Function to get the username

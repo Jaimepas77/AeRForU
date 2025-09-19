@@ -99,6 +99,16 @@ async function getProblemCategories(problemId) {
     return contained_categories;
 }
 
+async function isProblemsCategory(categoryId) {
+    let category_problems_url = "https://aceptaelreto.com/ws/cat/${categoryId}/problems";
+    category_problems_url = category_problems_url.replace("${categoryId}", categoryId);
+
+    const request = await fetch(category_problems_url);
+    const problem_list = await request.json();
+
+    return problem_list.problem.length > 0;
+}
+
 async function getCategoryData(categoryId) {
     let category_name_url = "https://aceptaelreto.com/ws/cat/${categoryId}";
     category_name_url = category_name_url.replace("${categoryId}", categoryId);
@@ -109,7 +119,7 @@ async function getCategoryData(categoryId) {
 }
 
 try {
-    module.exports = { isAC, isTried, getUserID, getLastError, getProblemCategories, getCategoryData };
+    module.exports = { isAC, isTried, getUserID, getLastError, getProblemCategories, isProblemsCategory, getCategoryData };
 }
 catch (e) {
     // Do nothing, this is for testing purposes

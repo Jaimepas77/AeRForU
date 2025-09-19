@@ -1,4 +1,4 @@
-const { isAC, isTried, getUserID, getLastError, getProblemCategories, getCategoryData } = require('./getters');
+const { isAC, isTried, getUserID, getLastError, getProblemCategories, isProblemsCategory, getCategoryData } = require('./getters');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
     const ret = await isAC(200, 17715);
@@ -34,6 +34,16 @@ test('getProblemCategories: problem 100', async () => {
     const ret = await getProblemCategories(100);
     expect(ret.length).toBe(5);
 }, 100000);
+
+test('isProblemsCategory: category 6', async () => {
+    const ret = await isProblemsCategory(6);
+    expect(ret).toBe(true);
+}, 10000);
+
+test('isProblemsCategory: category 2', async () => {
+    const ret = await isProblemsCategory(2);
+    expect(ret).toBe(false);
+}, 10000);
 
 test('getCategoryData: category 6', async () => {
     const ret = await getCategoryData(6);
