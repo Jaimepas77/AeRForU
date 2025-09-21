@@ -1,4 +1,4 @@
-const { isAC, isTried, getUserID, getLastError, getProblemCategories, isProblemsCategory, getCategoryData } = require('./getters');
+const { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData } = require('./getters');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
     const ret = await isAC(200, 17715);

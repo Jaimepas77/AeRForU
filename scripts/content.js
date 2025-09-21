@@ -55,6 +55,12 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 // Highlight the titles of the problems when the page is loaded
 (async function() {
     console.log("Problems page");
+
+    if(await checkIfProblemsPage() === false) {
+        console.log("Not a problems page, exiting...");
+        return;
+    }
+
     let username = getUsername();
     const userID = await updateUserID(username);
 
@@ -62,31 +68,45 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     const cookieName = "ACR_RememberMe";
     const pageUrl = window.location.href;
 
-    if (userID === false) {
-        console.log("No userID found for username " + username + ", trying to get it from the cookie");
+    console.log("User ID before checking cookies: " + userID);
 
-        // Send message to background to request the cookie value.
+    if(userID === false) {
+        // Get cookies acrsession and ACR_SessionCookie and try to get the nick, get the userID from the nick and highlight the titles
         chrome.runtime.sendMessage(
-            { type: "GET_COOKIE", url: pageUrl, name: cookieName },
+            { type: "GET_COOKIES", url: pageUrl, names: [ "acrsession", "ACR_SessionCookie", "ACR_RememberMe" ] },
             async (response) => {
                 // If response is undefined and chrome.runtime.lastError exists,
                 // the extension or background might not be reachable.
                 if (chrome.runtime.lastError) {
-                    console.log("Error getting cookie: " + chrome.runtime.lastError.message);
+                    console.log("Error getting cookies: " + chrome.runtime.lastError.message);
                     return;
                 }
-
                 if (response && response.success) {
-                    console.log("Cookie value: " + response.value);
-                    highlightTitles(await updateUserID(response.value));
-                } else {
-                    console.log("Error getting cookie: " + (response ? response.error : "No response"));
+                    let newUserID;
+                    let nick;
+                    if (response.values.ACR_RememberMe === null) {
+                        nick = await getNick(response.values.acrsession, response.values.ACR_SessionCookie);
+                        console.log("Nick from session cookies: " + nick);
+                    }
+                    else {
+                        nick = response.values.ACR_RememberMe;
+                        console.log("Nick from remember me cookie: " + nick);
+                    }
+                    newUserID = await updateUserID(nick);
+                    highlightTitles(newUserID);
+                }
+                else {
+                    console.log("Error getting cookies: " + (response ? response.error : "No response"));
                 }
             }
         );
         return;
     }
 
+    highlightTitles(userID);
+})();
+
+async function checkIfProblemsPage() {
     // Check if url contains cat=n or vol=n
     const urlParams = new URLSearchParams(window.location.search);
     const catParam = urlParams.get('cat');
@@ -94,10 +114,10 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     console.log("catParam: " + catParam);
     console.log("volParam: " + volParam);
     if ((catParam !== null && await isProblemsCategory(catParam)) || volParam !== null) {
-        highlightTitles(userID);
+        return true;
     }
-
-})();
+    return false;
+}
 
 //Function to get the username
 function getUsername() {
@@ -272,7 +292,7 @@ async function updateUserID(username) {
     else if (username !== undefined) {
         userID = await getUserID(username);
 
-        if (userID === undefined) {
+        if (userID === undefined || userID === null) {
             userID = false; // Hardcode your user ID
         }
         else {
@@ -286,6 +306,6 @@ async function updateUserID(username) {
         userID = false;
     }
 
-    //console.log("User ID: " + userID);
+    console.log("User ID: " + userID);
     return userID;
 }

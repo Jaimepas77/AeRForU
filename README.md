@@ -25,4 +25,5 @@ página deberás habilitar el modo Desarrollador.
 3. En la misma página, pulsa en el botón "Cargar descomprimida" y selecciona la carpeta en la que se encuentran los archivos de la extensión (que descargaste en el paso 1).
 
 ## Errores conocidos
-- No funciona si tu nombre completo es distinto de tu nick y no usas la funcionalidad de recordar el usuario en el inicio de sesión.
+- Funciona más rápido si tu nombre asociado al perfil es equivalente a tu nick.
+- No funciona la descarga de envíos si no usas la funcionalidad de recordar el usuario en el inicio de sesión.

@@ -58,6 +58,27 @@ async function getUserID(username) {
     return userID;
 }
 
+async function getNick(acrsession, ACR_session) {
+    const profile_url = "https://aceptaelreto.com/user/profile.php";
+    const request = await fetch(profile_url, {
+        method: 'GET',
+        headers: {
+            'Cookie': 'acrsession=' + acrsession
+                + '; ACR_SessionCookie=' + ACR_session
+
+        }
+    });
+
+    // Look for the nickname in the HTML
+    // The nickname is in a p inside a div following a label with text "Nick"
+    const text = await request.text();
+    
+    // Use RegExp to find the nickname
+    const regex = /<label[^>]*>\s*Nick\s*<\/label>\s*<div[^>]*>\s*<p[^>]*>([^<]*)<\/p>/i;
+    const match = text.match(regex);
+    return match ? match[1] : null;
+}
+
 async function getLastError(problemId, userID) {
     // Get the last submission
     let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
@@ -119,7 +140,7 @@ async function getCategoryData(categoryId) {
 }
 
 try {
-    module.exports = { isAC, isTried, getUserID, getLastError, getProblemCategories, isProblemsCategory, getCategoryData };
+    module.exports = { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData };
 }
 catch (e) {
     // Do nothing, this is for testing purposes
