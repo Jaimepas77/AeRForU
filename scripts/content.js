@@ -213,11 +213,13 @@ async function highlightProblemNode(problem, userID) {
         // problem.children[2].innerText = "Level " + problem_level;
 
         problem.children[2].style.fontWeight = "bold";
+        let unknown_text = "❔";
         let easy_text = "🟢";
         let medium_text = "🟡";
         let hard_text = "🔴";
         let very_hard_text = "💀";
         if (SHOW_LEVEL_TEXT == 1) { //Texto en español
+            unknown_text = "Desconocido";
             easy_text = "Fácil";
             medium_text = "Medio";
             hard_text = "Difícil";
@@ -229,7 +231,12 @@ async function highlightProblemNode(problem, userID) {
             hard_text = "★★★";
         }
 
-        if (problem_level <= 50) {
+        if (problem_level == null) {
+            problem.children[2].innerText = unknown_text;
+            problem.children[2].style.textAlign = "center";
+            problem.children[2].style.color = "gray";
+        }
+        else if (problem_level <= 50) {
             problem.children[2].innerText = easy_text;
             problem.children[2].style.textAlign = "center";
             problem.children[2].style.color = "green";
