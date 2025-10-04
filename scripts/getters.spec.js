@@ -1,4 +1,5 @@
-const { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData } = require('./getters');
+const { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getProblemLevel } = require('./getters');
+const levels_dict = require('../data/levels.js');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
     const ret = await isAC(200, 17715);
@@ -49,4 +50,9 @@ test('getCategoryData: category 6', async () => {
     const ret = await getCategoryData(6);
     expect(ret.name).toBe('Bucles simples');
     expect(ret.desc).toBe('for\'s, while\'s o do-while\'s sin anidamiento.');
+});
+
+test('getProblemLevel: problem 116', async () => {
+    const ret = await getProblemLevel(116);
+    expect(ret).toBeLessThan(25);
 });
