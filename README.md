@@ -4,6 +4,7 @@ Funciona en todos aquellos navegadores que estén basados en Chromium (como Goog
 El objetivo de la extensión es proporcionar funcionalidades adicionales sobre la plataforma, mejorando la experiencia de usuario.
 
 Actualmente se ofrecen las siguientes funcionalidades:
+- Inclusión del nivel de dificultad de cada problema en [la lista de problemas](https://aceptaelreto.com/problems/volumes.php/?vol=71).
 - Marcado de problemas resueltos e intentados en [la lista de problemas](https://aceptaelreto.com/problems/volumes.php/?vol=71).
 - Inclusión de un desplegable con categorías asociadas a un problema en [su página del enunciado](https://aceptaelreto.com/problem/statement.php?id=116).
 - Inclusión de hiperenlaces en los usuarios en [el ranking del concurso 24 en 23](https://aceptaelreto.com/24en23/2025/clasificacion.php).
@@ -27,3 +28,4 @@ página deberás habilitar el modo Desarrollador.
 ## Errores conocidos
 - Funciona más rápido si tu nombre asociado al perfil es equivalente a tu nick.
 - No funciona la descarga de envíos si no usas la funcionalidad de recordar el usuario en el inicio de sesión.
+- El nivel de dificultad de los problemas no se muestra si no inicias sesión.
