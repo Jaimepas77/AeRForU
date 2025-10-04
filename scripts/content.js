@@ -2,7 +2,7 @@
 let AcColor = "#f2fff2";//light green
 let WaColor = "#ffe6e6";//light red
 let BOLD = true;
-let SHOW_LEVEL = false;
+let SHOW_LEVEL = true;
 let SHOW_LEVEL_TEXT = 1; // 0: emojis, 1: texto en español, 2: estrellas
 chrome.storage.local.get(["BOLD", "AcColor", "WaColor", "SHOW_LEVEL"], function (data) {
     if (data.BOLD !== undefined) {
