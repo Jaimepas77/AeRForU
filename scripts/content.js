@@ -216,10 +216,12 @@ async function highlightProblemNode(problem, userID) {
         let easy_text = "🟢";
         let medium_text = "🟡";
         let hard_text = "🔴";
+        let very_hard_text = "💀";
         if (SHOW_LEVEL_TEXT == 1) { //Texto en español
             easy_text = "Fácil";
             medium_text = "Medio";
             hard_text = "Difícil";
+            very_hard_text = "Extremo";
         }
         else if (SHOW_LEVEL_TEXT == 2) { // Estrellas
             easy_text = "★☆☆";
@@ -237,10 +239,15 @@ async function highlightProblemNode(problem, userID) {
             problem.children[2].style.textAlign = "center";
             problem.children[2].style.color = "orange";
         }
-        else {
+        else if (problem_level < 95) {
             problem.children[2].innerText = hard_text;
             problem.children[2].style.textAlign = "center";
             problem.children[2].style.color = "red";
+        }
+        else { // problem_level >= 95
+            problem.children[2].innerText =  very_hard_text;
+            problem.children[2].style.textAlign = "center";
+            problem.children[2].style.color = "purple";
         }
     }
 }
