@@ -28,4 +28,5 @@ página deberás habilitar el modo Desarrollador.
 ## Errores conocidos
 - Funciona más rápido si tu nombre asociado al perfil es equivalente a tu nick.
 - No funciona la descarga de envíos si no usas la funcionalidad de recordar el usuario en el inicio de sesión.
-- El nivel de dificultad de los problemas no se muestra si no inicias sesión.
+
+Si encuentras algún error que no esté listado puedes notificarlo en la sección de issues del repositorio.

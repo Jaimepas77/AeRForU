@@ -73,6 +73,8 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         return;
     }
 
+    showLevel();
+
     let username = getUsername();
     const userID = await updateUserID(username);
 
@@ -143,6 +145,86 @@ function getUsername() {
     return username;
 }
 
+async function showLevel() {
+    if (!SHOW_LEVEL) return;
+
+    console.log("Showing problem levels...");
+
+    try {
+        let finalTable = document.getElementById("problemsInfo").children[1].children[3];
+        finalTable.children[0].children[1].innerText.trim(); // Intentar acceder a un elemento para verificar si la tabla está cargada
+    }
+    catch (error) {
+        console.log("Table not found yet, waiting...");
+        setTimeout(showLevel, 100);
+        return;
+    }
+
+    const problemsInfo = document.getElementById("problemsInfo");
+    if (problemsInfo === null) return;
+
+    const table = problemsInfo.children[1];
+    const header = table.children[1].children[0];
+    header.children[2].title = "Nivel de dificultad";
+    header.children[2].innerText = "Nivel";
+    header.children[2].style.textAlign = "center";
+
+    const problemNodes = table.children[3];
+    for (const problem of problemNodes.children) {
+        setLevel(problem);
+    }
+}
+
+async function setLevel(problem) {
+    const problemId = problem.children[0].innerText.trim();
+    problem_level = await getProblemLevel(problemId);
+
+    problem.children[2].style.fontWeight = "bold";
+    let unknown_text = "❔";
+    let easy_text = "🟢";
+    let medium_text = "🟡";
+    let hard_text = "🔴";
+    let very_hard_text = "💀";
+    if (SHOW_LEVEL_TEXT == 1) { //Texto en español
+        unknown_text = "Desconocido";
+        easy_text = "Fácil";
+        medium_text = "Medio";
+        hard_text = "Difícil";
+        very_hard_text = "Extremo";
+    }
+    else if (SHOW_LEVEL_TEXT == 2) { // Estrellas
+        easy_text = "★☆☆";
+        medium_text = "★★☆";
+        hard_text = "★★★";
+    }
+
+    if (problem_level == null) {
+        problem.children[2].innerText = unknown_text;
+        problem.children[2].style.textAlign = "center";
+        problem.children[2].style.color = "gray";
+    }
+    else if (problem_level <= 50) {
+        problem.children[2].innerText = easy_text;
+        problem.children[2].style.textAlign = "center";
+        problem.children[2].style.color = "green";
+    }
+    else if (problem_level <= 77) {
+        problem.children[2].innerText = medium_text;
+        problem.children[2].style.textAlign = "center";
+        problem.children[2].style.color = "orange";
+    }
+    else if (problem_level < 95) {
+        problem.children[2].innerText = hard_text;
+        problem.children[2].style.textAlign = "center";
+        problem.children[2].style.color = "red";
+    }
+    else { // problem_level >= 95
+        problem.children[2].innerText = very_hard_text;
+        problem.children[2].style.textAlign = "center";
+        problem.children[2].style.color = "purple";
+    }
+}
+
 async function highlightTitles(userID) {
     console.log("Ini of AeRForU: highlighting problems")
     if (userID !== false) {
@@ -205,57 +287,6 @@ async function highlightProblemNode(problem, userID) {
     if (BOLD) {
         problem.children[0].style.fontWeight = "bold";
         problem.children[1].style.fontWeight = "bold";
-    }
-
-    if (SHOW_LEVEL) {
-        problem_level = await getProblemLevel(problemId);
-
-        // problem.children[2].innerText = "Level " + problem_level;
-
-        problem.children[2].style.fontWeight = "bold";
-        let unknown_text = "❔";
-        let easy_text = "🟢";
-        let medium_text = "🟡";
-        let hard_text = "🔴";
-        let very_hard_text = "💀";
-        if (SHOW_LEVEL_TEXT == 1) { //Texto en español
-            unknown_text = "Desconocido";
-            easy_text = "Fácil";
-            medium_text = "Medio";
-            hard_text = "Difícil";
-            very_hard_text = "Extremo";
-        }
-        else if (SHOW_LEVEL_TEXT == 2) { // Estrellas
-            easy_text = "★☆☆";
-            medium_text = "★★☆";
-            hard_text = "★★★";
-        }
-
-        if (problem_level == null) {
-            problem.children[2].innerText = unknown_text;
-            problem.children[2].style.textAlign = "center";
-            problem.children[2].style.color = "gray";
-        }
-        else if (problem_level <= 50) {
-            problem.children[2].innerText = easy_text;
-            problem.children[2].style.textAlign = "center";
-            problem.children[2].style.color = "green";
-        }
-        else if (problem_level <= 77) {
-            problem.children[2].innerText = medium_text;
-            problem.children[2].style.textAlign = "center";
-            problem.children[2].style.color = "orange";
-        }
-        else if (problem_level < 95) {
-            problem.children[2].innerText = hard_text;
-            problem.children[2].style.textAlign = "center";
-            problem.children[2].style.color = "red";
-        }
-        else { // problem_level >= 95
-            problem.children[2].innerText =  very_hard_text;
-            problem.children[2].style.textAlign = "center";
-            problem.children[2].style.color = "purple";
-        }
     }
 }
 
