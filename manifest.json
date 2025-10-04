@@ -1,6 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Acepta el Reto for u!",
+    "author": "Jaime Pastrana García",
     "description": "Chrome extension to highlight solved problems on aceptaelreto.com",
     "version": "1.0.10",
     "action": {
