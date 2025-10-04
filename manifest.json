@@ -19,6 +19,7 @@
     "content_scripts": [
         {
             "js": [
+                "data/levels.js",
                 "scripts/getters.js",
                 "scripts/content.js",
                 "scripts/update.js"

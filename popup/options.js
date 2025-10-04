@@ -52,6 +52,14 @@ optionsFormDownload.Download.addEventListener("click", () => {
     });
 });
 
+optionsFormList.showLevel.addEventListener("change", (event) => {
+    chrome.storage.local.set({ SHOW_LEVEL: event.target.checked });
+    // Reload the page to apply the changes
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.reload(tabs[0].id);
+    });
+});
+
 //Listen to changes in the storage
 chrome.storage.onChanged.addListener((changes, namespace) => {
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
@@ -68,13 +76,16 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
             else if (key === 'hyperlinks') {
                 optionsForm24en23.hyperlinks.checked = newValue;
             }
+            else if (key === 'SHOW_LEVEL') {
+                optionsFormList.showLevel.checked = newValue;
+            }
         }
     }
 });
 
 async function loadOptions() {
     // Initialize the form with the user's option settings
-    const data = await chrome.storage.local.get(["BOLD", "AcColor", "WaColor", "hyperlinks"]);
+    const data = await chrome.storage.local.get(["BOLD", "AcColor", "WaColor", "hyperlinks", "SHOW_LEVEL"]);
     optionsFormList.bold.checked = Boolean(data.BOLD);
     if (data.AcColor === undefined || data.WaColor === undefined) {
         optionsFormList.AcColor.value = "#d4edda"; // light green
@@ -86,6 +97,7 @@ async function loadOptions() {
         optionsFormList.WaColor.value = data.WaColor;
     }
     optionsForm24en23.hyperlinks.checked = Boolean(data.hyperlinks);
+    optionsFormList.showLevel.checked = Boolean(data.SHOW_LEVEL);
 }
 
 async function checkVersion() {

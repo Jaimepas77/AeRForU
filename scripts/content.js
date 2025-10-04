@@ -2,7 +2,9 @@
 let AcColor = "#f2fff2";//light green
 let WaColor = "#ffe6e6";//light red
 let BOLD = true;
-chrome.storage.local.get(["BOLD", "AcColor", "WaColor"], function (data) {
+let SHOW_LEVEL = false;
+let SHOW_LEVEL_TEXT = 1; // 0: emojis, 1: texto en español, 2: estrellas
+chrome.storage.local.get(["BOLD", "AcColor", "WaColor", "SHOW_LEVEL"], function (data) {
     if (data.BOLD !== undefined) {
         BOLD = data.BOLD;
     }
@@ -21,9 +23,16 @@ chrome.storage.local.get(["BOLD", "AcColor", "WaColor"], function (data) {
     else {
         chrome.storage.local.set({ WaColor: WaColor });
     }
+    if (data.SHOW_LEVEL !== undefined) {
+        SHOW_LEVEL = data.SHOW_LEVEL;
+    }
+    else {
+        chrome.storage.local.set({ SHOW_LEVEL: SHOW_LEVEL });
+    }
     // console.log("BOLD: " + BOLD);
     // console.log("AcColor: " + AcColor);
     // console.log("WaColor: " + WaColor);
+    // console.log("SHOW_LEVEL: " + SHOW_LEVEL);
 });
 
 chrome.storage.onChanged.addListener(function (changes, namespace) {
@@ -37,6 +46,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
             }
             else if (key === 'WaColor') {
                 WaColor = changes[key].newValue;
+            }
+            else if (key === 'SHOW_LEVEL') {
+                SHOW_LEVEL = changes[key].newValue;
             }
         }
     }
@@ -158,18 +170,25 @@ async function highlightTitles(userID) {
         const table = problemsInfo.children[1];
         // console.log(table);
 
+        const header = table.children[1].children[0];
+        if (SHOW_LEVEL) {
+            header.children[2].title = "Nivel de dificultad";
+            header.children[2].innerText = "Nivel";
+            header.children[2].style.textAlign = "center";
+        }
+
         const problemNodes = table.children[3];
         // console.log(problemNodes.children);
 
         for (const problem of problemNodes.children) {
             // Llamada asíncrona (se ejecutan en paralelo)
-            highlightProblemTitle(problem, userID);
+            highlightProblemNode(problem, userID);
         }
     }
     console.log("End of AeRForU");
 }
 
-async function highlightProblemTitle(problem, userID) {
+async function highlightProblemNode(problem, userID) {
     const title = problem.children[1].innerText.trim();
     const problemId = problem.children[0].innerText.trim();
     // console.log("Title: " + title);
@@ -186,6 +205,43 @@ async function highlightProblemTitle(problem, userID) {
     if (BOLD) {
         problem.children[0].style.fontWeight = "bold";
         problem.children[1].style.fontWeight = "bold";
+    }
+
+    if (SHOW_LEVEL) {
+        problem_level = await getProblemLevel(problemId);
+
+        // problem.children[2].innerText = "Level " + problem_level;
+
+        problem.children[2].style.fontWeight = "bold";
+        let easy_text = "🟢";
+        let medium_text = "🟡";
+        let hard_text = "🔴";
+        if (SHOW_LEVEL_TEXT == 1) { //Texto en español
+            easy_text = "Fácil";
+            medium_text = "Medio";
+            hard_text = "Difícil";
+        }
+        else if (SHOW_LEVEL_TEXT == 2) { // Estrellas
+            easy_text = "★☆☆";
+            medium_text = "★★☆";
+            hard_text = "★★★";
+        }
+
+        if (problem_level <= 50) {
+            problem.children[2].innerText = easy_text;
+            problem.children[2].style.textAlign = "center";
+            problem.children[2].style.color = "green";
+        }
+        else if (problem_level <= 77) {
+            problem.children[2].innerText = medium_text;
+            problem.children[2].style.textAlign = "center";
+            problem.children[2].style.color = "orange";
+        }
+        else {
+            problem.children[2].innerText = hard_text;
+            problem.children[2].style.textAlign = "center";
+            problem.children[2].style.color = "red";
+        }
     }
 }
 

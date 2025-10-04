@@ -139,8 +139,12 @@ async function getCategoryData(categoryId) {
     return category_data;
 }
 
+async function getProblemLevel(problemId) {
+    return levels_dict[problemId] || null;
+}
+
 try {
-    module.exports = { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData };
+    module.exports = { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getProblemLevel };
 }
 catch (e) {
     // Do nothing, this is for testing purposes
