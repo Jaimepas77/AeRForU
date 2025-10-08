@@ -3,7 +3,7 @@ To run the tests, use this command in the root folder of the project:
 npm test
 */
 
-const { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getProblemLevel } = require('./getters');
+const { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getProblemLevel, getLevelsText } = require('./getters');
 const levels_dict = require('../data/levels.js');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
@@ -60,4 +60,35 @@ test('getCategoryData: category 6', async () => {
 test('getProblemLevel: problem 116', async () => {
     const ret = await getProblemLevel(116);
     expect(ret).toBeLessThan(25);
+});
+
+test('getLevelsText: default', async () => {
+    const ret = await getLevelsText();
+    expect(ret.easy).toBe("Fácil");
+    expect(ret.medium).toBe("Medio");
+    expect(ret.hard).toBe("Difícil");
+    expect(ret.very_hard).toBe("Extremo");
+});
+
+test('getLevelsText: emojis', async () => {
+    const ret = await getLevelsText(0);
+    expect(ret.easy).toBe("🟢");
+    expect(ret.medium).toBe("🟡");
+    expect(ret.hard).toBe("🔴");
+    expect(ret.very_hard).toBe("💀");
+});
+
+test('getLevelsText: Spanish text', async () => {
+    const ret = await getLevelsText(1);
+    expect(ret.easy).toBe("Fácil");
+    expect(ret.medium).toBe("Medio");
+    expect(ret.hard).toBe("Difícil");
+    expect(ret.very_hard).toBe("Extremo");
+});
+
+test('getLevelsText: stars', async () => {
+    const ret = await getLevelsText(2);
+    expect(ret.easy).toBe("★☆☆");
+    expect(ret.medium).toBe("★★☆");
+    expect(ret.hard).toBe("★★★");
 });

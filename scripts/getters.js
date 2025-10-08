@@ -143,8 +143,41 @@ async function getProblemLevel(problemId) {
     return levels_dict[problemId] || null;
 }
 
+async function getLevelsText(type=1) {
+    // Get the level texts based on the type
+    // type 0: emojis
+    // type 1: Spanish text (default)
+    // type 2: stars
+    let unknown_text = "❔";
+    let easy_text = "🟢";
+    let medium_text = "🟡";
+    let hard_text = "🔴";
+    let very_hard_text = "💀";
+    if (type == 1) { //Texto en español
+        unknown_text = "Desconocido";
+        easy_text = "Fácil";
+        medium_text = "Medio";
+        hard_text = "Difícil";
+        very_hard_text = "Extremo";
+    }
+    else if (type == 2) { // Estrellas
+        easy_text = "★☆☆";
+        medium_text = "★★☆";
+        hard_text = "★★★";
+    }
+    
+    // Return dictionary with the texts
+    return {
+        "unknown": unknown_text,
+        "easy": easy_text,
+        "medium": medium_text,
+        "hard": hard_text,
+        "very_hard": very_hard_text
+    };
+}
+
 try {
-    module.exports = { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getProblemLevel };
+    module.exports = { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getProblemLevel, getLevelsText };
 }
 catch (e) {
     // Do nothing, this is for testing purposes

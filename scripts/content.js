@@ -177,49 +177,33 @@ async function showLevel() {
 
 async function setLevel(problem) {
     const problemId = problem.children[0].innerText.trim();
-    problem_level = await getProblemLevel(problemId);
+    let problem_level = await getProblemLevel(problemId);
 
     problem.children[2].style.fontWeight = "bold";
-    let unknown_text = "❔";
-    let easy_text = "🟢";
-    let medium_text = "🟡";
-    let hard_text = "🔴";
-    let very_hard_text = "💀";
-    if (SHOW_LEVEL_TEXT == 1) { //Texto en español
-        unknown_text = "Desconocido";
-        easy_text = "Fácil";
-        medium_text = "Medio";
-        hard_text = "Difícil";
-        very_hard_text = "Extremo";
-    }
-    else if (SHOW_LEVEL_TEXT == 2) { // Estrellas
-        easy_text = "★☆☆";
-        medium_text = "★★☆";
-        hard_text = "★★★";
-    }
+    let level_texts = await getLevelsText(SHOW_LEVEL_TEXT);
 
     if (problem_level == null) {
-        problem.children[2].innerText = unknown_text;
+        problem.children[2].innerText = level_texts.unknown;
         problem.children[2].style.textAlign = "center";
         problem.children[2].style.color = "gray";
     }
     else if (problem_level <= 50) {
-        problem.children[2].innerText = easy_text;
+        problem.children[2].innerText = level_texts.easy;
         problem.children[2].style.textAlign = "center";
         problem.children[2].style.color = "green";
     }
     else if (problem_level <= 77) {
-        problem.children[2].innerText = medium_text;
+        problem.children[2].innerText = level_texts.medium;
         problem.children[2].style.textAlign = "center";
         problem.children[2].style.color = "orange";
     }
     else if (problem_level < 95) {
-        problem.children[2].innerText = hard_text;
+        problem.children[2].innerText = level_texts.hard;
         problem.children[2].style.textAlign = "center";
         problem.children[2].style.color = "red";
     }
     else { // problem_level >= 95
-        problem.children[2].innerText = very_hard_text;
+        problem.children[2].innerText = level_texts.very_hard;
         problem.children[2].style.textAlign = "center";
         problem.children[2].style.color = "purple";
     }
