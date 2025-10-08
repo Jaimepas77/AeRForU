@@ -40,6 +40,16 @@
         },
         {
             "js": [
+                "data/levels.js",
+                "scripts/getters.js",
+                "scripts/problem_stats.js"
+            ],
+            "matches": [
+                "*://aceptaelreto.com/problem/statistics.php*"
+            ]
+        },
+        {
+            "js": [
                 "scripts/hyperlink.js"
             ],
             "matches": [
