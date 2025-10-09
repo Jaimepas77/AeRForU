@@ -187,17 +187,17 @@ async function setLevel(problem) {
         problem.children[2].style.textAlign = "center";
         problem.children[2].style.color = "gray";
     }
-    else if (problem_level <= 50) {
+    else if (problem_level <= LEVEL_EASY) {
         problem.children[2].innerText = level_texts.easy;
         problem.children[2].style.textAlign = "center";
         problem.children[2].style.color = "green";
     }
-    else if (problem_level <= 77) {
+    else if (problem_level <= LEVEL_MEDIUM) {
         problem.children[2].innerText = level_texts.medium;
         problem.children[2].style.textAlign = "center";
         problem.children[2].style.color = "orange";
     }
-    else if (problem_level < 95) {
+    else if (problem_level < LEVEL_HARD) {
         problem.children[2].innerText = level_texts.hard;
         problem.children[2].style.textAlign = "center";
         problem.children[2].style.color = "red";

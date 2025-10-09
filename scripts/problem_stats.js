@@ -1,11 +1,12 @@
-let SHOW_LEVEL = true;
+let SHOW_LEVEL = null;
 
 chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
     if (data.SHOW_LEVEL !== undefined) {
         SHOW_LEVEL = data.SHOW_LEVEL;
     }
     else {
-        chrome.storage.local.set({ SHOW_LEVEL: SHOW_LEVEL });
+        chrome.storage.local.set({ SHOW_LEVEL: true });
+        SHOW_LEVEL = true;
     }
 });
 
@@ -26,6 +27,8 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 })();
 
 async function showLevel() {
+    if (SHOW_LEVEL === null) setTimeout(showLevel, 100);
+
     if (!SHOW_LEVEL) return;
 
     console.log("Showing problem levels...");
@@ -111,22 +114,22 @@ function createProgressBar(cell, problem_level=null) {
         progressFill.style.backgroundColor = "#999999";
         levelNumber.style.color = "gray";
     }
-    else if (problem_level <= 50) {
+    else if (problem_level <= LEVEL_EASY) {
         progressFill.style.width = `${problem_level}%`;
         progressFill.style.backgroundColor = "#4caf50";
         levelNumber.style.color = "#4caf50";
     }
-    else if (problem_level <= 77) {
+    else if (problem_level <= LEVEL_MEDIUM) {
         progressFill.style.width = `${problem_level}%`;
         progressFill.style.backgroundColor = "#ff9800";
         levelNumber.style.color = "#ff9800";
     }
-    else if (problem_level < 95) {
+    else if (problem_level < LEVEL_HARD) {
         progressFill.style.width = `${problem_level}%`;
         progressFill.style.backgroundColor = "#f44336";
         levelNumber.style.color = "#f44336";
     }
-    else { // problem_level >= 95
+    else { // problem_level >= LEVEL_HARD
         progressFill.style.width = `${problem_level}%`;
         progressFill.style.backgroundColor = "#9c27b0";
         levelNumber.style.color = "#9c27b0";

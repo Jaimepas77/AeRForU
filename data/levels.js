@@ -1,3 +1,7 @@
+LEVEL_EASY = 50;
+LEVEL_MEDIUM = 77;
+LEVEL_HARD = 95;
+
 levels_dict = {
   "100": 30,
   "101": 55,
