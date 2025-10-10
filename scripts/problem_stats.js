@@ -23,11 +23,32 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 (async function() {
     console.log("Stats page");
 
-    showLevel();
+    //Extract problem id from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const problem_id = urlParams.get('id');
+
+    let problem_level = await getProblemLevel(problem_id);
+
+    showLevel(problem_level);
+
+    //Get user nickname from storage
+    let user_nick = await new Promise((resolve) => {
+        chrome.storage.local.get("username", function (data) {
+            resolve(data.username);
+        });
+    });
+
+    if (user_nick !== undefined) {
+        user_position = await getUserProblemPosition(user_nick, problem_id);
+        updatePosition(user_position);
+    }
 })();
 
-async function showLevel() {
-    if (SHOW_LEVEL === null) setTimeout(showLevel, 100);
+async function showLevel(problem_level=null) {
+    if (SHOW_LEVEL === null) {
+        console.log("SHOW_LEVEL is null, waiting...");
+        setTimeout(() => showLevel(problem_level), 100);
+    }
 
     if (!SHOW_LEVEL) return;
 
@@ -38,15 +59,9 @@ async function showLevel() {
     }
     catch (error) {
         console.log("Table not found yet, waiting...");
-        setTimeout(showLevel, 100);
+        setTimeout(() => showLevel(problem_level), 100);
         return;
     }
-
-    //Extract problem id from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const problem_id = urlParams.get('id');
-
-    let problem_level = await getProblemLevel(problem_id);
 
     //DOM manipulation
     const finalTable = document.getElementsByClassName("problemGlobalStatistics")[0];
@@ -60,9 +75,6 @@ async function showLevel() {
 
     const colgroups = finalTable.getElementsByTagName("colgroup")[0];
     colgroups.remove();
-
-    body.children[0].children[3].innerText = problem_level;
-    body.children[0].children[3].style.fontWeight = "bold";
 
     // Progress bar display and color coding
     const cell = body.children[0].children[3];
@@ -141,3 +153,25 @@ function createProgressBar(cell, problem_level=null) {
     cell.appendChild(progressContainer);
 }
 
+async function updatePosition(position) {
+    if (position === null) return;
+
+    try {
+        const positionTable = document.getElementsByClassName("userProblemBestSubmission")[0];
+    }
+    catch (error) {
+        console.log("Position table not found yet, waiting...");
+        setTimeout(() => updatePosition(position), 100);
+        return;
+    }
+
+    const positionTable = document.getElementsByClassName("userProblemBestSubmission")[0];
+    // console.log(positionTable);
+
+    // If the table is hidden, do nothing
+    if (positionTable.parentElement.style.display === "none") return;
+
+    const body = positionTable.getElementsByTagName("tbody")[0];
+    const elem = body.children[0].children[0];
+    elem.innerText = position;
+}

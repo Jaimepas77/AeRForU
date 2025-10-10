@@ -176,8 +176,28 @@ async function getLevelsText(type=1) {
     };
 }
 
+async function getUserProblemPosition(user_nick, problemId) {
+    let position_url = `https://aerdata.lluiscab.net/aer/user/profile/${user_nick}`;
+
+    try {
+        const response = await fetch(position_url);
+        const data = await response.json();
+        problems = data.data.user.problems;
+        for (const problem of problems) {
+            // console.log(problem);
+            if (problem.id == problemId) {
+                return problem.result.position;
+            }
+        }
+        return null; // Problem not found in user's solved problems
+    } catch (error) {
+        console.error("Error fetching user problem position:", error);
+        return null;
+    }
+}
+
 try {
-    module.exports = { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getProblemLevel, getLevelsText };
+    module.exports = { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getProblemLevel, getLevelsText, getUserProblemPosition };
 }
 catch (e) {
     // Do nothing, this is for testing purposes
