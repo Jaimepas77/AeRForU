@@ -56,7 +56,7 @@ async function addRankingBtn() {
         return;
     }
     const finalTable = document.getElementsByClassName("problemBestSubmissions")[0];
-    console.log(finalTable);
+    // console.log(finalTable);
 
     const btn_html = `
     <tfoot id="seeMoreRankingRow" style="">
@@ -97,9 +97,6 @@ async function loadMoreRankings(url) {
         // console.log(data);
         // console.log(tbody);
         // console.log(data.submission);
-
-        // Sort entries by ranking in ascending order
-        data.submission.sort((a, b) => a.ranking - b.ranking);
 
         // Get tbody last ranking number
         const lastRanking = tbody.children.length > 0 ? parseInt(tbody.children[tbody.children.length - 1].children[0].innerText) : 0;
