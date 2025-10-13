@@ -29,6 +29,8 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 
     let problem_level = await getProblemLevel(problem_id);
 
+    addRankingBtn();
+
     showLevel(problem_level);
 
     //Get user nickname from storage
@@ -43,6 +45,97 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         updatePosition(user_position);
     }
 })();
+
+async function addRankingBtn() {
+    try {
+        const finalTable = document.getElementsByClassName("problemBestSubmissions")[0];
+    }
+    catch (error) {
+        console.log("Table not found yet, waiting...");
+        setTimeout(addRankingBtn, 100);
+        return;
+    }
+    const finalTable = document.getElementsByClassName("problemBestSubmissions")[0];
+    console.log(finalTable);
+
+    const btn_html = `
+    <tfoot id="seeMoreRankingRow" style="">
+        <tr>
+            <td class="seeMore" colspan="7">
+                <span class="btn btn-primary btn-xs">Ver más</span>
+            </td>
+        </tr>
+    </tfoot>
+    `;
+
+    //Insert the button at the end of the table
+    finalTable.insertAdjacentHTML('beforeend', btn_html);
+
+    document.getElementById("seeMoreRankingRow").addEventListener("click", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const problem_id = urlParams.get('id');
+        const tbody = document.querySelector(".problemBestSubmissions tbody");
+        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length+1}&size=20`;
+
+        // Call the function to load more rankings
+        loadMoreRankings(next_url);
+    });
+
+}
+
+async function loadMoreRankings(url) {
+    console.log("Loading more rankings from:", url);
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        const tbody = document.querySelector(".problemBestSubmissions tbody");
+        // console.log(data);
+        // console.log(tbody);
+        // console.log(data.submission);
+
+        // Sort entries by ranking in ascending order
+        data.submission.sort((a, b) => a.ranking - b.ranking);
+
+        // Get tbody last ranking number
+        const lastRanking = tbody.children.length > 0 ? parseInt(tbody.children[tbody.children.length - 1].children[0].innerText) : 0;
+
+        // Set correct ranking numbers
+        data.submission.forEach((entry, index) => {
+            entry.ranking = lastRanking + index + 1;
+        });
+        
+        data.submission.forEach(entry => {
+            const row = document.createElement("tr");
+            const submissionDate = new Date(entry.submissionDate);
+            const formattedDate = submissionDate.getFullYear() + '-' +
+                ('0' + (submissionDate.getMonth() + 1)).slice(-2) + '-' +
+                ('0' + submissionDate.getDate()).slice(-2) + ' ' +
+                ('0' + submissionDate.getHours()).slice(-2) + ':' +
+                ('0' + submissionDate.getMinutes()).slice(-2) + ':' +
+                ('0' + submissionDate.getSeconds()).slice(-2);
+
+            const language = entry.language === "CPP" ? "C++" : entry.language === "JAVA" ? "Java" : entry.language;
+
+            row.innerHTML = `
+                <td class="ranking">${entry.ranking}</td>
+                <td class="num">${entry.num}</td>
+                <td class="user_nick"><a href="/user/profile.php?id=${entry.user.id}" title="${entry.user.nick}">${entry.user.nick}</a></td>
+                <td class="language">${language}</td>
+                <td class="executionTime">${entry.executionTime}</td>
+                <td class="memoryUsed">${entry.memoryUsed}</td>
+                <td class="submissionDate"><time datetime="${entry.submissionDate}">${formattedDate}</time></td>
+            `;
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error loading more rankings:", error);
+    }
+}
 
 async function showLevel(problem_level=null) {
     if (SHOW_LEVEL === null) {
