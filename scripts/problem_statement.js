@@ -24,6 +24,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     console.log("Statement page");
     showLevel();
     updateCategories();
+    showRecommendations();
 })();
 
 async function showLevel() {
