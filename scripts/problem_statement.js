@@ -20,9 +20,10 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
 });
 
-(async function() {
-    console.log("Stats page");
-    await showLevel();
+(function() {
+    console.log("Statement page");
+    showLevel();
+    updateCategories();
 })();
 
 async function showLevel() {

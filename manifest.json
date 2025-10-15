@@ -31,8 +31,10 @@
         },
         {
             "js": [
+                "data/levels.js",
                 "scripts/getters.js",
-                "scripts/problem.js"
+                "scripts/problem_statement_categories.js",
+                "scripts/problem_statement.js"
             ],
             "matches": [
                 "*://aceptaelreto.com/problem/statement.php*"
@@ -46,16 +48,6 @@
             ],
             "matches": [
                 "*://aceptaelreto.com/problem/statistics.php*"
-            ]
-        },
-        {
-            "js": [
-                "data/levels.js",
-                "scripts/getters.js",
-                "scripts/problem_statement.js"
-            ],
-            "matches": [
-                "*://aceptaelreto.com/problem/statement.php*"
             ]
         },
         {

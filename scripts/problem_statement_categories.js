@@ -115,9 +115,9 @@ async function insertCategories(categories) {
 }
 
 async function getProblemId() {
-    const url = window.location.href;
-    const problemId = url.split("=")[1];
-    return problemId;
+    const urlParams = new URLSearchParams(window.location.search);
+    const problem_id = urlParams.get('id');
+    return problem_id;
 }
 
-updateCategories();
+
