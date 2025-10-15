@@ -3,7 +3,7 @@ To run the tests, use this command in the root folder of the project:
 npm test
 */
 
-const { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getProblemLevel, getLevelsText, getUserProblemPosition } = require('./getters');
+const { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemLevel, getLevelsText, getUserProblemPosition } = require('./getters');
 const levels_dict = require('../data/levels.js');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
@@ -55,6 +55,11 @@ test('getCategoryData: category 6', async () => {
     const ret = await getCategoryData(6);
     expect(ret.name).toBe('Bucles simples');
     expect(ret.desc).toBe('for\'s, while\'s o do-while\'s sin anidamiento.');
+});
+
+test('getCategoryProblems: category 6', async () => {
+    const ret = await getCategoryProblems(6);
+    expect(ret.length).toBeGreaterThan(140);
 });
 
 test('getProblemLevel: problem 116', async () => {

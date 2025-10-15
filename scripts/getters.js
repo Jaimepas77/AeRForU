@@ -166,13 +166,20 @@ async function getCategoryData(categoryId) {
     return category_data;
 }
 
-// TODO: test
 async function getCategoryProblems(categoryId) {
     let category_problems_url = "https://aceptaelreto.com/ws/cat/${categoryId}/problems";
     category_problems_url = category_problems_url.replace("${categoryId}", categoryId);
     const request = await fetch(category_problems_url);
-    const problem_list = await request.json();
-    return problem_list.problem;
+    let problem_list = await request.json();
+    let problems = problem_list.problem;
+
+    while (problem_list.nextLink !== undefined) {
+        const nextRequest = await fetch(problem_list.nextLink);
+        problem_list = await nextRequest.json();
+        problems = problems.concat(problem_list.problem);
+    }
+
+    return problems;
 }
 
 async function getProblemLevel(problemId) {
@@ -233,7 +240,7 @@ async function getUserProblemPosition(user_nick, problemId) {
 }
 
 try {
-    module.exports = { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getProblemLevel, getLevelsText, getUserProblemPosition };
+    module.exports = { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemLevel, getLevelsText, getUserProblemPosition };
 }
 catch (e) {
     // Do nothing, this is for testing purposes
