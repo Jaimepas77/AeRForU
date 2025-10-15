@@ -2,7 +2,7 @@ async function updateCategories() {
     let problemId = parseInt(await getProblemId());
 
     // Load cached categories
-    let problem_categories = await new Promise((resolve) => {
+    let problems_categories = await new Promise((resolve) => {
         chrome.storage.local.get("problemCategories", function (data) {
             resolve(data.problemCategories);
         });
@@ -12,30 +12,30 @@ async function updateCategories() {
     // Update categories
     let categories = [];
     let new_categories = getProblemCategories(problemId);
-    if (problem_categories !== undefined && problem_categories[problemId] !== undefined) { // If categories are found in storage
+    if (problems_categories !== undefined && problems_categories[problemId] !== undefined) { // If categories are found in storage
         // console.log("Categories from storage: ", problem_categories);
-        categories = problem_categories[problemId];
+        categories = problems_categories[problemId];
 
         insertCategories(categories);
     }
     else { // If categories are not found in storage
         // console.log("No categories found in storage");
         // If no categories are found, create a new Map
-        if (problem_categories === undefined) {
-            problem_categories = new Map();
+        if (problems_categories === undefined) {
+            problems_categories = new Map();
         }
         categories = await new_categories;
         // console.log("Categories from API: ", categories);
-        problem_categories[problemId] = categories;
+        problems_categories[problemId] = categories;
         
         insertCategories(categories);
     }
 
     if (await new_categories.length !== categories.length) {
         // Update categories in storage
-        problem_categories[problemId] = await new_categories;
+        problems_categories[problemId] = await new_categories;
         // console.log("Updating categories in storage: ", problem_categories);
-        chrome.storage.local.set({ problemCategories: problem_categories });
+        chrome.storage.local.set({ problemCategories: problems_categories });
     }
 }
 
@@ -119,5 +119,3 @@ async function getProblemId() {
     const problem_id = urlParams.get('id');
     return problem_id;
 }
-
-

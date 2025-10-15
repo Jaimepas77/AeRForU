@@ -91,7 +91,34 @@ async function getLastError(problemId, userID) {
     return submissions.submission[0].result;
 }
 
+// Not testeable function, depends on chrome.storage
+async function getCachedProblemCategories(problemId) { // If not cached, return from the other function
+    if (typeof problemId === 'string') {
+        problemId = parseInt(problemId);
+    }
+    
+    let problems_categories = await new Promise((resolve) => {
+        chrome.storage.local.get("problemCategories", function (data) {
+            resolve(data.problemCategories);
+        });
+    });
+
+    if (problems_categories === undefined || problems_categories[problemId] === undefined) {
+        if (problems_categories === undefined) {
+            problems_categories = new Map();
+        }
+        problems_categories[problemId] = await getProblemCategories(problemId);
+        chrome.storage.local.set({ problemCategories: problems_categories });
+    }
+
+    return problems_categories[problemId] || [];
+}
+
 async function getProblemCategories(problemId) {
+    if (typeof problemId === 'string') {
+        problemId = parseInt(problemId);
+    }
+    
     let category_problems_url = "https://aceptaelreto.com/ws/cat/${categoryId}/problems";
     let contained_categories = [];
 
@@ -137,6 +164,15 @@ async function getCategoryData(categoryId) {
     const category_data = await request.json();
     // console.log("Category data: " + category_data.name);
     return category_data;
+}
+
+// TODO: test
+async function getCategoryProblems(categoryId) {
+    let category_problems_url = "https://aceptaelreto.com/ws/cat/${categoryId}/problems";
+    category_problems_url = category_problems_url.replace("${categoryId}", categoryId);
+    const request = await fetch(category_problems_url);
+    const problem_list = await request.json();
+    return problem_list.problem;
 }
 
 async function getProblemLevel(problemId) {
