@@ -9,16 +9,22 @@ async function updateCategories() {
     });
     // console.log("Categories from storage: ", problem_categories);
 
+    let use_cached = problems_categories !== undefined && problems_categories[problemId] !== undefined;
+
     // Update categories
     let categories = [];
-    let new_categories = getProblemCategories(problemId);
-    if (problems_categories !== undefined && problems_categories[problemId] !== undefined) { // If categories are found in storage
+    if (use_cached) { // If categories are found in storage
         // console.log("Categories from storage: ", problem_categories);
         categories = problems_categories[problemId];
 
         insertCategories(categories);
+
+        // Wait for 1000 ms to let other http requests finish before updating categories
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    else { // If categories are not found in storage
+
+    let new_categories = getProblemCategories(problemId);
+    if (!use_cached) { // If categories are not found in storage
         // console.log("No categories found in storage");
         // If no categories are found, create a new Map
         if (problems_categories === undefined) {
@@ -31,6 +37,7 @@ async function updateCategories() {
         insertCategories(categories);
     }
 
+    // Always update categories in background
     if (await new_categories.length !== categories.length) {
         // Update categories in storage
         problems_categories[problemId] = await new_categories;
@@ -41,10 +48,7 @@ async function updateCategories() {
 
 async function insertCategories(categories) {
     let categories_data = [];
-    for (let i = 0; i < categories.length; i++) {
-        let cat = await getCategoryData(categories[i]);
-        categories_data.push(cat);
-    }
+    categories_data = await Promise.all(categories.map(cat => getCategoryData(cat)));
 
     const categoriesDiv = document.getElementById("content").children[0].children[0];
 

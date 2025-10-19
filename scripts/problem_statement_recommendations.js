@@ -29,6 +29,12 @@ async function showRecommendations() {
     if (SHOW_RECOMMENDATIONS === null) setTimeout(showRecommendations, 100);
     if (!SHOW_RECOMMENDATIONS) return;
 
+    let problemRecommendations = await new Promise((resolve) => {
+        chrome.storage.local.get("problemRecommendations", function (data) {
+            resolve(data.problemRecommendations || {});
+        });
+    });
+
     console.log("Showing problem recommendations...");
 
     const problemId = await getProblemId();
@@ -37,6 +43,13 @@ async function showRecommendations() {
         return;
     }
 
+    if (problemRecommendations[problemId] !== undefined) { // Use cached recommendations?
+        console.log("Using cached recommendations for problem " + problemId);
+        insertProblems(problemRecommendations[problemId].slice(0, 5));
+        return;
+    }
+
+    // START RECOMMENDATION CALCULATION
     let categories = await getCachedProblemCategories(problemId);
     if (!categories || categories.length === 0) {
         console.log("No categories found for problem " + problemId);
@@ -72,6 +85,13 @@ async function showRecommendations() {
         }
         return b[1] - a[1];
     });
+    // END RECOMMENDATION CALCULATION
+
+    // Update cache with top 10 recommendations (to save space)
+    problemRecommendations[problemId] = sortedProblems.map(entry => entry[0]).slice(0, 10);
+
+    // Cache sorted problems
+    chrome.storage.local.set({ problemRecommendations: problemRecommendations });
 
     // console.log("Best problem recommendations:", sortedProblems.slice(0, 5));
 
@@ -80,10 +100,7 @@ async function showRecommendations() {
 
 async function insertProblems(problemIds) {
     let problems_data = [];
-    for (let i = 0; i < problemIds.length; i++) {
-        let prob = await getProblemInfo(problemIds[i]);
-        problems_data.push(prob);
-    }
+    problems_data = await Promise.all(problemIds.map(id => getProblemInfo(id)));
 
     const recommendationsDiv = document.getElementById("content").children[0].children[0];
 
