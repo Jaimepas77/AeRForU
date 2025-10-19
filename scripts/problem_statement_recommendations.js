@@ -99,8 +99,29 @@ async function showRecommendations() {
 }
 
 async function insertProblems(problemIds) {
+    // Get problem data (title, num)
     let problems_data = [];
     problems_data = await Promise.all(problemIds.map(id => getProblemInfo(id)));
+
+    // Get userID from storage
+    const userID = await new Promise((resolve) => {
+        chrome.storage.local.get("userID", function (data) {
+            resolve(data.userID);
+        });
+    });
+
+    // Check tried and AC statuses
+    let tried_statuses = [];
+    let ac_statuses = [];
+
+    if (userID === undefined) {
+        tried_statuses = new Array(problems_data.length).fill(false);
+        ac_statuses = new Array(problems_data.length).fill(false);
+    }
+    else {
+        tried_statuses = await Promise.all(problems_data.map(prob => isTried(prob.num, userID)));
+        ac_statuses = await Promise.all(problems_data.map(prob => isAC(prob.num, userID)));
+    }
 
     const recommendationsDiv = document.getElementById("content").children[0].children[0];
 
@@ -142,10 +163,10 @@ async function insertProblems(problemIds) {
             border-radius: 0 0 4px 4px;
             margin-top: -4px;
             ">
-            ${problems_data.map(prob => `<span
+            ${problems_data.map((prob, i) => `<span
                  style="
                 display: inline-block;
-                background-color:rgb(198, 233, 240);
+                background-color:${ac_statuses[i] ? 'rgba(197, 241, 197, 1)' : tried_statuses[i] ? 'rgba(241, 198, 198, 1)' : 'rgb(198, 233, 240)'};
                 color: #333;
                 padding: 5px 10px;
                 border-radius: 12px;
