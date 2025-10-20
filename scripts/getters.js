@@ -39,6 +39,59 @@ async function isTried(problemId, userID) {
     return submissions.submission.length !== 0;
 }
 
+async function isCategoryCompleted(categoryId, userID) {
+    if (await isProblemsCategory(categoryId) === false) {
+        return false;
+    }
+
+    let category_problems_url = "https://aceptaelreto.com/ws/cat/${categoryId}/problems";
+    category_problems_url = category_problems_url.replace("${categoryId}", categoryId);
+    const request = await fetch(category_problems_url);
+    let problem_list = await request.json();
+    let problems = problem_list.problem;
+
+    if (problems.length > 0) {
+        const chunkSize = 20;
+        for (let i = 0; i < problems.length; i += chunkSize) {
+            const chunk = problems.slice(i, i + chunkSize);
+            const promises = chunk.map(problem => isAC(problem.num, userID));
+            const results = await Promise.all(promises);
+            if (results.some(result => result === false)) {
+            return false;
+            }
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+async function isVolumeCompleted(volumeId, userID) {
+    let volume_problems_url = "https://aceptaelreto.com/ws/volume/${volumeId}/problems";
+    volume_problems_url = volume_problems_url.replace("${volumeId}", volumeId);
+    const request = await fetch(volume_problems_url);
+    let problem_list = await request.json();
+
+    let problems = problem_list.problem;
+
+    if (problems.length > 0) {
+        const chunkSize = 20;
+        for (let i = 0; i < problems.length; i += chunkSize) {
+            const chunk = problems.slice(i, i + chunkSize);
+            const promises = chunk.map(problem => isAC(problem.num, userID));
+            const results = await Promise.all(promises);
+            if (results.some(result => result === false)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 async function getUserID(username) {
     // console.log("New username: " + username);
     const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
@@ -247,7 +300,7 @@ async function getUserProblemPosition(user_nick, problemId) {
 }
 
 try {
-    module.exports = { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemLevel, getLevelsText, getUserProblemPosition };
+    module.exports = { isAC, isTried, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemLevel, getLevelsText, getUserProblemPosition };
 }
 catch (e) {
     // Do nothing, this is for testing purposes

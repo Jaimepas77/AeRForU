@@ -68,12 +68,11 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 (async function() {
     console.log("Problems page");
 
-    if(await checkIfProblemsPage() === false) {
-        console.log("Not a problems page, exiting...");
-        return;
-    }
+    isProblemsPage = await checkIfProblemsPage();
 
-    showLevel();
+    if (isProblemsPage) {
+        showLevel();
+    }
 
     let username = getUsername();
     const userID = await updateUserID(username);
@@ -106,8 +105,15 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
                         nick = response.values.ACR_RememberMe;
                         console.log("Nick from remember me cookie: " + nick);
                     }
+
                     newUserID = await updateUserID(nick);
-                    highlightTitles(newUserID);
+                    if (isProblemsPage) {
+                        highlightTitles(newUserID);
+                    }
+                    else {
+                        console.log("Not a problems page");
+                        highlightCategories(newUserID, await checkIfCategoriesPage());
+                    }
                 }
                 else {
                     console.log("Error getting cookies: " + (response ? response.error : "No response"));
@@ -117,7 +123,13 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         return;
     }
 
-    highlightTitles(userID);
+    if (isProblemsPage) {
+        highlightTitles(userID);
+    }
+    else {
+        console.log("Not a problems page");
+        highlightCategories(userID, await checkIfCategoriesPage());
+    }
 })();
 
 async function checkIfProblemsPage() {
@@ -128,6 +140,14 @@ async function checkIfProblemsPage() {
     console.log("catParam: " + catParam);
     console.log("volParam: " + volParam);
     if ((catParam !== null && await isProblemsCategory(catParam)) || volParam !== null) {
+        return true;
+    }
+    return false;
+}
+
+async function checkIfCategoriesPage() {
+    // Check if url contains categories.php
+    if (window.location.pathname.includes('categories.php')) {
         return true;
     }
     return false;
@@ -356,7 +376,45 @@ async function addError(problem, userID) {
             display: block;
         }`;
     document.head.appendChild(style);
+}
 
+async function highlightCategories(userID, isCategory=false) {
+    if (userID !== false) {
+        try {
+            let finalTable = document.getElementById("subcatsInfo").children[1].children[3];
+            finalTable.children[0].children[1].innerText.trim(); // Intentar acceder a un elemento para verificar si la tabla está cargada
+        }
+        catch (error) {
+            console.log("Table not found yet, waiting...");
+            setTimeout(highlightCategories, 100, userID);
+            return;
+        }
+
+        const subcatsInfo = document.getElementById("subcatsInfo");
+
+        if (subcatsInfo === null) return;
+
+        const table = subcatsInfo.children[1];
+        const categoryNodes = table.children[3];
+
+        for (const category of categoryNodes.children) {
+            highlightCategoryNode(category, userID, isCategory);
+        }
+    }
+}
+
+async function highlightCategoryNode(category, userID, isCategory=false) {
+    const categoryId = category.children[0].children[0].href.split('=')[1];
+    if (isCategory) {
+        if (await isCategoryCompleted(categoryId, userID)) {
+            category.style.backgroundColor = AcColor;
+        }
+    }
+    else {
+        if (await isVolumeCompleted(categoryId, userID)) {
+            category.style.backgroundColor = AcColor;
+        }
+    }
 }
 
 async function updateUserID(username) {
