@@ -3,7 +3,7 @@ To run the tests, use this command in the root folder of the project:
 npm test
 */
 
-const { isAC, isTried, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemLevel, getLevelsText, getUserProblemPosition } = require('./getters');
+const { isAC, isTried, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemLevel, getLevelsText, getUserProblemPosition } = require('./getters');
 const levels_dict = require('../data/levels.js');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
@@ -23,6 +23,31 @@ test('isTried: problem 331 of elferni', async () => {
 
 test('isTried: problem 332 of elferni', async () => {
     const ret = await isTried(332, 8);
+    expect(ret).toBe(false);
+});
+
+test('isCategoryCompleted: category 155 of jjjjjjjp022', async () => {
+    const ret = await isCategoryCompleted(155, 17715);
+    expect(ret).toBe(true);
+});
+
+test('isCategoryCompleted: category 102 of jjjjjjjp022', async () => {
+    const ret = await isCategoryCompleted(102, 17715);
+    expect(ret).toBe(false);
+});
+
+test('isCategoryCompleted: category 101 of jjjjjjjp022', async () => {
+    const ret = await isCategoryCompleted(101, 17715);
+    expect(ret).toBe(false);
+});
+
+test('isVolumeCompleted: volume 71 of AperezaC', async () => {
+    const ret = await isVolumeCompleted(71, 3428);
+    expect(ret).toBe(true);
+}, 10000);
+
+test('isVolumeCompleted: volume 71 of jjjjjjjp022', async () => {
+    const ret = await isVolumeCompleted(71, 17715);
     expect(ret).toBe(false);
 });
 
