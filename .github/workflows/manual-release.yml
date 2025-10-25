@@ -21,7 +21,7 @@ jobs:
     - name: Create AeRForU ZIP
       run: |
         mkdir build
-        zip -r build/AeRForU.zip popup images scripts manifest.json README.md
+        zip -r build/AeRForU.zip data popup images scripts manifest.json README.md
 
     - name: Upload release asset
       uses: softprops/action-gh-release@v2
