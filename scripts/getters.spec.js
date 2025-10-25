@@ -41,6 +41,11 @@ test('isCategoryCompleted: category 101 of jjjjjjjp022', async () => {
     expect(ret).toBe(false);
 });
 
+test('isCategoryCompleted: category 101 of AperezaC', async () => {
+    const ret = await isCategoryCompleted(101, 3428);
+    expect(ret).toBe(true);
+});
+
 test('isVolumeCompleted: volume 71 of AperezaC', async () => {
     const ret = await isVolumeCompleted(71, 3428);
     expect(ret).toBe(true);

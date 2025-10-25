@@ -41,29 +41,42 @@ async function isTried(problemId, userID) {
 
 async function isCategoryCompleted(categoryId, userID) {
     if (await isProblemsCategory(categoryId) === false) {
-        return false;
-    }
-
-    let category_problems_url = "https://aceptaelreto.com/ws/cat/${categoryId}/problems";
-    category_problems_url = category_problems_url.replace("${categoryId}", categoryId);
-    const request = await fetch(category_problems_url);
-    let problem_list = await request.json();
-    let problems = problem_list.problem;
-
-    if (problems.length > 0) {
-        const chunkSize = 20;
-        for (let i = 0; i < problems.length; i += chunkSize) {
-            const chunk = problems.slice(i, i + chunkSize);
-            const promises = chunk.map(problem => isAC(problem.num, userID));
-            const results = await Promise.all(promises);
-            if (results.some(result => result === false)) {
-            return false;
+        let category_categories_url = "https://aceptaelreto.com/ws/cat/${categoryId}/?md=1";
+        category_categories_url = category_categories_url.replace("${categoryId}", categoryId);
+        const request = await fetch(category_categories_url);
+        const category_data = await request.json();
+        if (category_data.subcats.length > 0) {
+            for (const subcat of category_data.subcats) {
+                const completed = await isCategoryCompleted(subcat.id, userID);
+                if (completed === false) {
+                    return false;
+                }
             }
         }
         return true;
     }
     else {
-        return false;
+        let category_problems_url = "https://aceptaelreto.com/ws/cat/${categoryId}/problems";
+        category_problems_url = category_problems_url.replace("${categoryId}", categoryId);
+        const request = await fetch(category_problems_url);
+        let problem_list = await request.json();
+        let problems = problem_list.problem;
+
+        if (problems.length > 0) {
+            const chunkSize = 20;
+            for (let i = 0; i < problems.length; i += chunkSize) {
+                const chunk = problems.slice(i, i + chunkSize);
+                const promises = chunk.map(problem => isAC(problem.num, userID));
+                const results = await Promise.all(promises);
+                if (results.some(result => result === false)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
 
