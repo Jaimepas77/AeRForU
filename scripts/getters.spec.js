@@ -41,8 +41,8 @@ test('isCategoryCompleted: category 101 of jjjjjjjp022', async () => {
     expect(ret).toBe(false);
 });
 
-test('isCategoryCompleted: category 101 of AperezaC', async () => {
-    const ret = await isCategoryCompleted(101, 3428);
+test('isCategoryCompleted: category 83 of danimania', async () => {
+    const ret = await isCategoryCompleted(83, 37576);
     expect(ret).toBe(true);
 });
 
