@@ -184,32 +184,18 @@ async function getProblemCategories(problemId) {
     if (typeof problemId === 'string') {
         problemId = parseInt(problemId);
     }
+
+    let problem_categories_url = "https://aceptaelreto.com/ws/problem/${problemId}/cat";
+    problem_categories_url = problem_categories_url.replace("${problemId}", problemId);
     
-    let category_problems_url = "https://aceptaelreto.com/ws/cat/${categoryId}/problems";
     let contained_categories = [];
 
-    let category_info_url = "https://aceptaelreto.com/ws/cat/all";
+    const request = await fetch(problem_categories_url);
+    const categories_list = await request.json();
+    for (const category of categories_list.category) {
+        contained_categories.push(category.id);
+    }
 
-    // Scan the categories
-    // Fetch all categories' metadata
-    const all_categories_request = await fetch(category_info_url);
-    const all_categories = await all_categories_request.json();
-
-    // Filter for categories that actually contain problems
-    const relevant_categories = all_categories.filter(cat => cat.numOfProblems > 0);
-
-    // Check each relevant category for the problem
-    const categoryChecks = relevant_categories.map(async (category) => {
-        const request = await fetch(category_problems_url.replace("${categoryId}", category.id));
-        const problem_list = await request.json();
-        if (problem_list.problem && problem_list.problem.some(elem => elem.num === problemId)) {
-            return category.id;
-        }
-        return null;
-    });
-
-    const results = await Promise.all(categoryChecks);
-    contained_categories = results.filter(id => id !== null);
     return contained_categories;
 }
 
