@@ -183,23 +183,54 @@ async function showLevel() {
     const problemsInfo = document.getElementById("problemsInfo");
     if (problemsInfo === null) return;
 
+    // Add level column to the table
     const table = problemsInfo.children[1];
     const header = table.children[1].children[0];
     header.children[2].title = "Nivel de dificultad";
-    header.children[2].innerText = "Nivel";
+    header.children[2].innerText = "Nivel ⇅"; // ⇅ or ⇕ or ▲▼ or ±
     header.children[2].style.textAlign = "center";
 
+    // Set level for each problem
     const problemNodes = table.children[3];
-    for (const problem of problemNodes.children) {
-        setLevel(problem);
-    }
+    await Promise.all(Array.from(problemNodes.children).map(async (problem) => {
+        const problem_level = await setLevel(problem);
+
+        const hiddenLevel = document.createElement('span');
+        hiddenLevel.style.display = 'none';
+        hiddenLevel.innerText = problem_level;
+        problem.children[2].appendChild(hiddenLevel);
+    }));
+
+    // Add sorting functionality to the level column
+    header.children[2].style.cursor = "pointer";
+    header.children[2].addEventListener("click", () => {
+        const rows = Array.from(problemNodes.children);
+        const isDescending = header.children[2].classList.contains("desc");
+        rows.sort((a, b) => {
+            const levelA = a.children[2].children[0].innerText;
+            const levelB = b.children[2].children[0].innerText;
+            return isDescending ? levelB - levelA : levelA - levelB;
+        });
+        // Remove existing rows
+        while (problemNodes.firstChild) {
+            problemNodes.removeChild(problemNodes.firstChild);
+        }
+        // Append sorted rows
+        rows.forEach(row => problemNodes.appendChild(row));
+        // Toggle sort direction
+        header.children[2].classList.toggle("asc", isDescending);
+        header.children[2].classList.toggle("desc", !isDescending);
+        // Set arrow indicator
+        header.children[2].innerText = isDescending ? "Nivel ▲" : "Nivel ▼";
+    });
 }
 
 async function setLevel(problem) {
     const problemId = problem.children[0].innerText.trim();
-    let problem_level = await getProblemLevel(problemId);
+    const problem_level = await getProblemLevel(problemId);
 
     problem.children[2].style.fontWeight = "bold";
+    problem.children[2].title = problem_level;
     let level_texts = await getLevelsText(SHOW_LEVEL_TEXT);
 
     if (problem_level == null) {
@@ -227,6 +258,8 @@ async function setLevel(problem) {
         problem.children[2].style.textAlign = "center";
         problem.children[2].style.color = "purple";
     }
+
+    return problem_level;
 }
 
 async function highlightTitles(userID) {
@@ -255,13 +288,6 @@ async function highlightTitles(userID) {
         //Get all the text nodes in the table
         const table = problemsInfo.children[1];
         // console.log(table);
-
-        const header = table.children[1].children[0];
-        if (SHOW_LEVEL) {
-            header.children[2].title = "Nivel de dificultad";
-            header.children[2].innerText = "Nivel";
-            header.children[2].style.textAlign = "center";
-        }
 
         const problemNodes = table.children[3];
         // console.log(problemNodes.children);
