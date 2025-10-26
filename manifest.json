@@ -3,7 +3,7 @@
     "name": "Acepta el Reto for u!",
     "author": "Jaime Pastrana García",
     "description": "Chrome extension to highlight solved problems on aceptaelreto.com",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "action": {
         "default_popup": "popup/hello.html",
         "default_icon": {
@@ -27,6 +27,14 @@
             ],
             "matches": [
                 "*://aceptaelreto.com/problems/*"
+            ]
+        },
+        {
+            "js": [
+                "scripts/profile.js"
+            ],
+            "matches": [
+                "*://aceptaelreto.com/user/profile.php*"
             ]
         },
         {
