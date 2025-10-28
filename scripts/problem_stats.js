@@ -1,6 +1,7 @@
 let SHOW_LEVEL = null;
+let N_RANKINGS_LOADED = 20;
 
-chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
+chrome.storage.local.get(['SHOW_LEVEL'], function (data) {
     if (data.SHOW_LEVEL !== undefined) {
         SHOW_LEVEL = data.SHOW_LEVEL;
     }
@@ -20,7 +21,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
 });
 
-(async function() {
+(async function () {
     console.log("Stats page");
 
     //Extract problem id from URL
@@ -71,11 +72,11 @@ async function addRankingBtn() {
     //Insert the button at the end of the table
     finalTable.insertAdjacentHTML('beforeend', btn_html);
 
-    document.getElementById("seeMoreRankingRow").addEventListener("click", function() {
+    document.getElementById("seeMoreRankingRow").addEventListener("click", function () {
         const urlParams = new URLSearchParams(window.location.search);
         const problem_id = urlParams.get('id');
         const tbody = document.querySelector(".problemBestSubmissions tbody");
-        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length+1}&size=20`;
+        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length + 1}&size=${N_RANKINGS_LOADED}`;
 
         // Call the function to load more rankings
         loadMoreRankings(next_url);
@@ -98,6 +99,12 @@ async function loadMoreRankings(url) {
         // console.log(tbody);
         // console.log(data.submission);
 
+        if (data.nextLink === undefined) {
+            // No more data to load
+            const seeMoreRow = document.getElementById("seeMoreRankingRow");
+            seeMoreRow.style.display = "none"; // Hide the "See More" button
+
+        }
         // Get tbody last ranking number
         const lastRanking = tbody.children.length > 0 ? parseInt(tbody.children[tbody.children.length - 1].children[0].innerText) : 0;
 
@@ -105,7 +112,7 @@ async function loadMoreRankings(url) {
         data.submission.forEach((entry, index) => {
             entry.ranking = lastRanking + index + 1;
         });
-        
+
         data.submission.forEach(entry => {
             const row = document.createElement("tr");
             const submissionDate = new Date(entry.submissionDate);
@@ -134,7 +141,7 @@ async function loadMoreRankings(url) {
     }
 }
 
-async function showLevel(problem_level=null) {
+async function showLevel(problem_level = null) {
     if (SHOW_LEVEL === null) {
         console.log("SHOW_LEVEL is null, waiting...");
         setTimeout(() => showLevel(problem_level), 100);
@@ -171,7 +178,7 @@ async function showLevel(problem_level=null) {
     createProgressBar(cell, problem_level);
 }
 
-function createProgressBar(cell, problem_level=null) {
+function createProgressBar(cell, problem_level = null) {
     cell.innerHTML = ''; // Clear the cell
 
     const progressContainer = document.createElement("div");
