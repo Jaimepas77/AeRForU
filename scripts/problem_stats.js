@@ -103,8 +103,8 @@ async function loadMoreRankings(url) {
             // No more data to load
             const seeMoreRow = document.getElementById("seeMoreRankingRow");
             seeMoreRow.style.display = "none"; // Hide the "See More" button
-
         }
+        
         // Get tbody last ranking number
         const lastRanking = tbody.children.length > 0 ? parseInt(tbody.children[tbody.children.length - 1].children[0].innerText) : 0;
 
