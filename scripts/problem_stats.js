@@ -141,7 +141,7 @@ async function loadMoreRankings(url) {
     }
 }
 
-async function showLevel(problem_level = null) {
+async function showLevel(problem_level=null) {
     if (SHOW_LEVEL === null) {
         console.log("SHOW_LEVEL is null, waiting...");
         setTimeout(() => showLevel(problem_level), 100);
