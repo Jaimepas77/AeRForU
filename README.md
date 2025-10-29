@@ -10,7 +10,7 @@ Actualmente se ofrecen las siguientes funcionalidades:
 - Inclusión de un desplegable con problemas similares en [la página del enunciado](https://aceptaelreto.com/problem/statement.php?id=116).
 - Inclusión de hiperenlaces a AER Stats en [la página del perfil](https://aceptaelreto.com/user/profile.php?id=17715).
 - Inclusión de hiperenlaces en los usuarios en [el ranking del concurso 24 en 23](https://aceptaelreto.com/24en23/2025/clasificacion.php).
-- Descarga del código asociado a todos los problemas que se hallan enviado con resultado AC.
+- Descarga del código asociado a todos los problemas que se hayan enviado con resultado AC.
 
 ## Aspecto visual
 A continuación se incluyen algunas capturas de pantalla de las funcionalidades del plugin.
