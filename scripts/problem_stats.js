@@ -72,7 +72,7 @@ async function addRankingBtn() {
     //Insert the button at the end of the table
     finalTable.insertAdjacentHTML('beforeend', btn_html);
 
-    document.getElementById("seeMoreRankingRow").addEventListener("click", function () {
+    document.getElementById("seeMoreRankingRow").addEventListener("click", function() {
         const urlParams = new URLSearchParams(window.location.search);
         const problem_id = urlParams.get('id');
         const tbody = document.querySelector(".problemBestSubmissions tbody");
