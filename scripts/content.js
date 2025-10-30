@@ -35,25 +35,6 @@ chrome.storage.local.get(["BOLD", "AcColor", "WaColor", "SHOW_LEVEL"], function 
     // console.log("SHOW_LEVEL: " + SHOW_LEVEL);
 });
 
-chrome.storage.onChanged.addListener(function (changes, namespace) {
-    if (namespace === 'local') {
-        for (key in changes) {
-            if (key === 'BOLD') {
-                BOLD = changes[key].newValue;
-            }
-            else if (key === 'AcColor') {
-                AcColor = changes[key].newValue;
-            }
-            else if (key === 'WaColor') {
-                WaColor = changes[key].newValue;
-            }
-            else if (key === 'SHOW_LEVEL') {
-                SHOW_LEVEL = changes[key].newValue;
-            }
-        }
-    }
-});
-
 // Debugging the storage
 // chrome.storage.onChanged.addListener((changes, namespace) => {
 //     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {

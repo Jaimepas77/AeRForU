@@ -10,16 +10,6 @@ chrome.storage.local.get(['SHOW_RECOMMENDATIONS'], function(data) {
     }
 });
 
-chrome.storage.onChanged.addListener(function (changes, namespace) {
-    if (namespace === 'local') {
-        for (let key in changes) {
-            if (key === 'SHOW_RECOMMENDATIONS') {
-                SHOW_RECOMMENDATIONS = changes[key].newValue;
-            }
-        }
-    }
-});
-
 // (function() {
 //     console.log("Recommendations page");
 //     showRecommendations();

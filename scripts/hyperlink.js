@@ -5,17 +5,6 @@ let usersRanking; //The ranking table
 
 let HYPERLINK = true; //24en23 hyperlinks
 
-chrome.storage.onChanged.addListener(function (changes, namespace) {
-    if (namespace === 'local') {
-        for (key in changes) {
-            if (key === 'hyperlinks') {
-                HYPERLINK = changes[key].newValue;
-                // console.log("HYPERLINK (changed): " + HYPERLINK);
-            }
-        }
-    }
-});
-
 chrome.storage.local.get(["hyperlinks"], function (data) {
     if (data.hyperlinks !== undefined) {
         HYPERLINK = data.hyperlinks;

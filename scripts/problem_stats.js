@@ -10,16 +10,6 @@ chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
     }
 });
 
-chrome.storage.onChanged.addListener(function (changes, namespace) {
-    if (namespace === 'local') {
-        for (key in changes) {
-            if (key === 'SHOW_LEVEL') {
-                SHOW_LEVEL = changes[key].newValue;
-            }
-        }
-    }
-});
-
 (async function() {
     console.log("Stats page");
 
