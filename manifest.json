@@ -31,6 +31,8 @@
         },
         {
             "js": [
+                "data/levels.js",
+                "scripts/getters.js",
                 "scripts/profile.js"
             ],
             "matches": [
