@@ -1,7 +1,7 @@
 let SHOW_LEVEL = null;
 let N_RANKINGS_LOADED = 20;
 
-chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
+chrome.storage.local.get(['SHOW_LEVEL'], function (data) {
     if (data.SHOW_LEVEL !== undefined) {
         SHOW_LEVEL = data.SHOW_LEVEL;
     }
@@ -21,7 +21,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
 });
 
-(async function() {
+(async function () {
     console.log("Stats page");
 
     //Extract problem id from URL
@@ -50,7 +50,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 async function addRankingBtn() {
     const urlParams = new URLSearchParams(window.location.search);
     const problem_id = urlParams.get('id');
-    const urlBase = 'https://aceptaelreto.com/ws/problem/${problem_id}/ranking';
+    const urlBase = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?`;
     const response = await fetch(urlBase);
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -84,11 +84,11 @@ async function addRankingBtn() {
     //Insert the button at the end of the table
     finalTable.insertAdjacentHTML('beforeend', btn_html);
 
-    document.getElementById("seeMoreRankingRow").addEventListener("click", function() {
+    document.getElementById("seeMoreRankingRow").addEventListener("click", function () {
         const urlParams = new URLSearchParams(window.location.search);
         const problem_id = urlParams.get('id');
         const tbody = document.querySelector(".problemBestSubmissions tbody");
-        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length+1}&size=${N_RANKINGS_LOADED}`;
+        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length + 1}&size=${N_RANKINGS_LOADED}`;
 
         // Call the function to load more rankings
         loadMoreRankings(next_url);
@@ -190,7 +190,7 @@ async function showLevel(problem_level=null) {
     createProgressBar(cell, problem_level);
 }
 
-function createProgressBar(cell, problem_level=null) {
+function createProgressBar(cell, problem_level = null) {
     cell.innerHTML = ''; // Clear the cell
 
     const progressContainer = document.createElement("div");
