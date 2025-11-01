@@ -52,9 +52,6 @@ async function addRankingBtn() {
     const problem_id = urlParams.get('id');
     const urlBase = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?`;
     const response = await fetch(urlBase);
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
     const data = await response.json();
     if (data.nextLink === undefined) {
         return;
