@@ -1,4 +1,5 @@
 let SHOW_LEVEL = null;
+let N_RANKINGS_LOADED = 20;
 
 chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
     if (data.SHOW_LEVEL !== undefined) {
@@ -37,6 +38,15 @@ chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
 })();
 
 async function addRankingBtn() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const problem_id = urlParams.get('id');
+    const urlBase = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?`;
+    const response = await fetch(urlBase);
+    const data = await response.json();
+    if (data.nextLink === undefined) {
+        return;
+    }
+
     try {
         const finalTable = document.getElementsByClassName("problemBestSubmissions")[0];
     }
@@ -65,7 +75,7 @@ async function addRankingBtn() {
         const urlParams = new URLSearchParams(window.location.search);
         const problem_id = urlParams.get('id');
         const tbody = document.querySelector(".problemBestSubmissions tbody");
-        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length+1}&size=20`;
+        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length+1}&size=${N_RANKINGS_LOADED}`;
 
         // Call the function to load more rankings
         loadMoreRankings(next_url);
@@ -88,6 +98,12 @@ async function loadMoreRankings(url) {
         // console.log(tbody);
         // console.log(data.submission);
 
+        if (data.nextLink === undefined) {
+            // No more data to load
+            const seeMoreRow = document.getElementById("seeMoreRankingRow");
+            seeMoreRow.style.display = "none"; // Hide the "See More" button
+        }
+        
         // Get tbody last ranking number
         const lastRanking = tbody.children.length > 0 ? parseInt(tbody.children[tbody.children.length - 1].children[0].innerText) : 0;
 
@@ -95,7 +111,7 @@ async function loadMoreRankings(url) {
         data.submission.forEach((entry, index) => {
             entry.ranking = lastRanking + index + 1;
         });
-        
+
         data.submission.forEach(entry => {
             const row = document.createElement("tr");
             const submissionDate = new Date(entry.submissionDate);
