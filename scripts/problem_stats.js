@@ -1,5 +1,4 @@
 let SHOW_LEVEL = null;
-let N_RANKINGS_LOADED = 20;
 
 chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
     if (data.SHOW_LEVEL !== undefined) {
@@ -40,15 +39,13 @@ chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
 async function addRankingBtn() {
     const urlParams = new URLSearchParams(window.location.search);
     const problem_id = urlParams.get('id');
-    const urlBase = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?`;
-    const response = await fetch(urlBase);
-    const data = await response.json();
+    const data = await getProblemRanking(problem_id);
     if (data.nextLink === undefined) {
         return;
     }
 
     try {
-        const finalTable = document.getElementsByClassName("problemBestSubmissions")[0];
+        document.getElementsByClassName("problemBestSubmissions")[0];
     }
     catch (error) {
         console.log("Table not found yet, waiting...");
@@ -72,28 +69,20 @@ async function addRankingBtn() {
     finalTable.insertAdjacentHTML('beforeend', btn_html);
 
     document.getElementById("seeMoreRankingRow").addEventListener("click", function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const problem_id = urlParams.get('id');
-        const tbody = document.querySelector(".problemBestSubmissions tbody");
-        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length+1}&size=${N_RANKINGS_LOADED}`;
-
         // Call the function to load more rankings
-        loadMoreRankings(next_url);
+        loadMoreRankings();
     });
-
 }
 
-async function loadMoreRankings(url) {
-    console.log("Loading more rankings from:", url);
+async function loadMoreRankings() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const problem_id = urlParams.get('id');
+    console.log("Loading more rankings for problem:", problem_id);
 
     try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-
         const tbody = document.querySelector(".problemBestSubmissions tbody");
+        const data = await getProblemRanking(problemId=problem_id, start=tbody.children.length+1);
+
         // console.log(data);
         // console.log(tbody);
         // console.log(data.submission);

@@ -241,6 +241,13 @@ async function getProblemInfo(problemId) {
     return problem_data;
 }
 
+async function getProblemRanking(problemId, start=1, size=20) {
+    let problem_ranking_url = `https://aceptaelreto.com/ws/problem/${problemId}/ranking?start=${start}&n=${size}`;
+    const request = await fetch(problem_ranking_url);
+    const ranking_data = await request.json();
+    return ranking_data;
+}
+
 async function getProblemLevel(problemId) {
     return levels_dict[problemId] || null;
 }
@@ -299,7 +306,7 @@ async function getUserProblemPosition(user_nick, problemId) {
 }
 
 try {
-    module.exports = { isAC, isTried, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemLevel, getLevelsText, getUserProblemPosition };
+    module.exports = { isAC, isTried, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition };
 }
 catch (e) {
     // Do nothing, this is for testing purposes
