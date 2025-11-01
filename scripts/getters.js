@@ -327,7 +327,7 @@ async function getUserProblemPosition(user_nick, problemId) {
         console.warn("⚠️ Aerdata falló:", err);
     }
 
-    // --- Intento 2: Fallback XML directo ---
+    // --- Intento 2: Fallback JSON directo ---
     console.log("↩️ Usando fallback (JSON de Acepta el Reto)");
     
     const userId = String(await getUserID(user_nick));
@@ -371,7 +371,7 @@ async function getUserProblemPosition(user_nick, problemId) {
             }
 
             nextUrl = data.nextLink || null;
-            if (!nextUrl) { console.log("🔚 No hay más páginas de ranking disponibles."); }
+            //if (!nextUrl) { console.log("🔚 No hay más páginas de ranking disponibles."); }
         } catch (err) {
             console.error("💥 Error procesando ranking JSON:", err);
             break;

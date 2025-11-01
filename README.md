@@ -1,5 +1,4 @@
 # AeRForU
-hola mundo!
 Acepta el Reto for u es una extensión de navegador para la plataforma de [aceptaelreto.com](https://aceptaelreto.com).
 Funciona en todos aquellos navegadores que estén basados en Chromium (como Google Chrome, Edge, Brave y Opera entre otros).
 El objetivo de la extensión es proporcionar funcionalidades adicionales sobre la plataforma, mejorando la experiencia de usuario.
