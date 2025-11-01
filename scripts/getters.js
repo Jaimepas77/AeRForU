@@ -1,3 +1,6 @@
+// getters.js (parcheado)
+
+// --- funciones anteriores (sin cambios) ---
 async function isAC(problemId, userID) {
     // Search for an AC submission
     let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
@@ -278,25 +281,102 @@ async function getLevelsText(type=1) {
     };
 }
 
-async function getUserProblemPosition(user_nick, problemId) {
-    let position_url = `https://aerdata.lluiscab.net/aer/user/profile/${user_nick}`;
+// --- getUserProblemPosition (REEMPLAZADA por versión robusta y con fallback a ranking) ---
 
+/**
+ * Obtiene la posición real del usuario en el ranking de un problema.
+ * - Primero intenta usar https://aerdata.lluiscab.net/aer/user/profile/${user_nick}
+ *   que es la opcion mas rapida y eficaz
+ * - Si no tiene la info, realiza paginado sobre
+ *   https://aceptaelreto.com/ws/problem/${problemId}/ranking y calcula
+ *   la posición entre usuarios únicos (ignorando envíos repetidos). El mayor problema es que tiene que ir de 20 en 20
+ *
+ * Devuelve:
+ *  - número (1-based) si se encuentra
+ *  - null si no se encuentra o hay un error
+ */
+async function getUserProblemPosition(user_nick, problemId) {
+    console.log("🔍 Buscando posición del usuario...");
+
+    // --- Intento 1: Aerdata ---
+    console.log("📊 Accediendo al ranking de Aerdata");
     try {
-        const response = await fetch(position_url);
-        const data = await response.json();
-        problems = data.data.user.problems;
-        for (const problem of problems) {
-            // console.log(problem);
-            if (problem.id == problemId) {
-                return problem.result.position;
+        const url = `https://aerdata.lluiscab.net/aer/user/profile/${encodeURIComponent(user_nick)}`;
+        const resp = await fetch(url);
+
+        if (resp.ok) {
+            const data = await resp.json();
+            const problems = data?.data?.user?.problems;
+
+            //Busqueda de la posicion del usuario
+            const found = problems?.find(p => String(p.id) === String(problemId));
+            const pos = found?.result?.position ?? null;
+            if (pos != null) {
+                console.log(`✅ Posición desde Aerdata: ${pos}`);
+                return pos;
             }
         }
-        return null; // Problem not found in user's solved problems
-    } catch (error) {
-        console.error("Error fetching user problem position:", error);
-        return null;
+    } catch (err) {
+        console.warn("⚠️ Aerdata falló:", err);
     }
+
+    // --- Intento 2: Fallback XML directo ---
+    console.log("↩️ Usando fallback (JSON de Acepta el Reto)");
+    
+    const userId = String(await getUserID(user_nick));
+    const userNickNorm = user_nick.trim().toLowerCase();
+    //console.log("🧩 userId:", userId, "userNickNorm:", userNickNorm);
+
+    let nextUrl = `https://aceptaelreto.com/ws/problem/${encodeURIComponent(problemId)}/ranking?start=1&size=100`;
+    
+    const seen = new Set();
+    let uniqueRank = 0;
+
+    while (nextUrl) {
+        try {
+            //console.log(`📥 Descargando ranking desde: ${nextUrl}`);
+            const resp = await fetch(nextUrl);
+            if (!resp.ok) {
+            console.warn(`❌ HTTP ${resp.status} al obtener ${nextUrl}`);
+            break;
+            }
+
+            const data = await resp.json();
+            //console.log(`🔎 Analizando ${data.submission.length} submissions...`);
+
+            for (const sub of data.submission) {
+                const uid = sub?.user?.id != null ? String(sub.user.id).trim() : null;
+                const nick = sub?.user?.nick ? sub.user.nick.trim().toLowerCase() : null;
+
+                // clave única preferente por id, sino por nick
+                const key = uid || (`nick:${nick || ""}`);
+
+                if (!seen.has(key)) { // primer envío de este usuario -> cuenta como 1 puesto único
+                    seen.add(key);
+                    uniqueRank += 1;
+
+                    // si coincide con el usuario objetivo, devolvemos la posición única
+                    if ((userId && uid && uid === userId) || (userId && nick && nick === userNickNorm) || (userId && nick && nick === userNickNorm)) {
+                        console.log(`✅ Posición real (usuarios únicos) encontrada: ${uniqueRank} (id:${uid} nick:${nick})`);
+                        return uniqueRank;
+                    }
+                } // si ya estaba en 'seen', ignoramos (es envío repetido de la misma persona)
+            }
+
+            nextUrl = data.nextLink || null;
+            if (!nextUrl) { console.log("🔚 No hay más páginas de ranking disponibles."); }
+        } catch (err) {
+            console.error("💥 Error procesando ranking JSON:", err);
+            break;
+        }
+    }
+
+    console.log("ℹ️ Usuario no encontrado en ranking.");
+    return null;
 }
+
+
+// --- resto del archivo original (sin cambios) ---
 
 try {
     module.exports = { isAC, isTried, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemLevel, getLevelsText, getUserProblemPosition };
