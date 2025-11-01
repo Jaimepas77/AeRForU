@@ -190,7 +190,7 @@ async function showLevel(problem_level=null) {
     createProgressBar(cell, problem_level);
 }
 
-function createProgressBar(cell, problem_level = null) {
+function createProgressBar(cell, problem_level=null) {
     cell.innerHTML = ''; // Clear the cell
 
     const progressContainer = document.createElement("div");
