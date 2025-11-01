@@ -85,7 +85,7 @@ async function addRankingBtn() {
         const urlParams = new URLSearchParams(window.location.search);
         const problem_id = urlParams.get('id');
         const tbody = document.querySelector(".problemBestSubmissions tbody");
-        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length + 1}&size=${N_RANKINGS_LOADED}`;
+        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length+1}&size=${N_RANKINGS_LOADED}`;
 
         // Call the function to load more rankings
         loadMoreRankings(next_url);
