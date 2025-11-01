@@ -37,8 +37,15 @@ chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
 })();
 
 async function addRankingBtn() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const problem_id = urlParams.get('id');
+    const data = await getProblemRanking(problem_id);
+    if (data.nextLink === undefined) {
+        return;
+    }
+
     try {
-        const finalTable = document.getElementsByClassName("problemBestSubmissions")[0];
+        document.getElementsByClassName("problemBestSubmissions")[0];
     }
     catch (error) {
         console.log("Table not found yet, waiting...");
@@ -62,32 +69,30 @@ async function addRankingBtn() {
     finalTable.insertAdjacentHTML('beforeend', btn_html);
 
     document.getElementById("seeMoreRankingRow").addEventListener("click", function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const problem_id = urlParams.get('id');
-        const tbody = document.querySelector(".problemBestSubmissions tbody");
-        next_url = `https://aceptaelreto.com/ws/problem/${problem_id}/ranking?start=${tbody.children.length+1}&size=20`;
-
         // Call the function to load more rankings
-        loadMoreRankings(next_url);
+        loadMoreRankings();
     });
-
 }
 
-async function loadMoreRankings(url) {
-    console.log("Loading more rankings from:", url);
+async function loadMoreRankings() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const problem_id = urlParams.get('id');
+    console.log("Loading more rankings for problem:", problem_id);
 
     try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-
         const tbody = document.querySelector(".problemBestSubmissions tbody");
+        const data = await getProblemRanking(problemId=problem_id, start=tbody.children.length+1);
+
         // console.log(data);
         // console.log(tbody);
         // console.log(data.submission);
 
+        if (data.nextLink === undefined) {
+            // No more data to load
+            const seeMoreRow = document.getElementById("seeMoreRankingRow");
+            seeMoreRow.style.display = "none"; // Hide the "See More" button
+        }
+        
         // Get tbody last ranking number
         const lastRanking = tbody.children.length > 0 ? parseInt(tbody.children[tbody.children.length - 1].children[0].innerText) : 0;
 
@@ -95,7 +100,7 @@ async function loadMoreRankings(url) {
         data.submission.forEach((entry, index) => {
             entry.ranking = lastRanking + index + 1;
         });
-        
+
         data.submission.forEach(entry => {
             const row = document.createElement("tr");
             const submissionDate = new Date(entry.submissionDate);

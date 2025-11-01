@@ -3,7 +3,7 @@ To run the tests, use this command in the root folder of the project:
 npm test
 */
 
-const { isAC, isTried, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemLevel, getLevelsText, getUserProblemPosition } = require('./getters');
+const { isAC, isTried, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition } = require('./getters');
 const levels_dict = require('../data/levels.js');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
@@ -96,6 +96,13 @@ test('getProblemInfo: problem 100', async () => {
     const ret = await getProblemInfo(100);
     expect(ret.num).toBe(100);
     expect(ret.title).toBe("Constante de Kaprekar");
+});
+
+test('getProblemRanking: problem 116', async () => {
+    const ret = await getProblemRanking(116);
+    expect(ret.nextLink).toBeDefined();
+    expect(ret.submission.length).toBe(20);
+    expect(ret.submission[0].user.nick).toBe("Messerschmitt");
 });
 
 test('getProblemLevel: problem 116', async () => {
