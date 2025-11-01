@@ -1,7 +1,7 @@
 let SHOW_LEVEL = null;
 let N_RANKINGS_LOADED = 20;
 
-chrome.storage.local.get(['SHOW_LEVEL'], function (data) {
+chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
     if (data.SHOW_LEVEL !== undefined) {
         SHOW_LEVEL = data.SHOW_LEVEL;
     }
