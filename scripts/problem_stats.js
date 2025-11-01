@@ -21,7 +21,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
 });
 
-(async function () {
+(async function() {
     console.log("Stats page");
 
     //Extract problem id from URL
