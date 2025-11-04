@@ -115,6 +115,22 @@ async function showLevel() {
         header.children[1].innerText = isDescending ? "Nivel ▲" : "Nivel ▼";
     });
 
+    // Set solved time for each problem
+    header.appendChild(document.createElement("th"));
+    header.children[2].title = "Tiempo de resolución";
+    header.children[2].innerText = "Tiempo";
+    header.children[2].style.textAlign = "center";
+
+    await Promise.all(Array.from(problemNodes.children).map(async (problem) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userID = urlParams.get('id');
+
+        const problemId = problem.children[0].innerText.split("-")[0].trim();
+        const solvedTime = await getSolvedTime(problemId, userID);
+        problem.appendChild(document.createElement("td"));
+        problem.children[2].innerText = solvedTime;
+    }));
+
     showStats(); // Show AeR stats after levels are shown
 }
 
