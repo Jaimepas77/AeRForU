@@ -166,7 +166,15 @@ async function showStats() {
     console.log("Showing AeR stats...");
 
     // Get problem levels
-    const problemLevels = await Promise.all(Array.from(document.getElementsByClassName("userProblems")[0].children[2].children).map(problem => getProblemLevel(problem.children[0].innerText.split("-")[0].trim())));
+    const problemLevels = await Promise.all(
+        Array.from(
+            document.getElementsByClassName("userProblems")[0].children[2].children
+        )
+        .filter(problem => problem.className != "danger") //Only solved problems count
+        .map(
+            problem => getProblemLevel(problem.children[0].innerText.split("-")[0].trim())
+        )
+    );
     // console.log("Problem levels:", problemLevels);
 
     // Get dashboard element
