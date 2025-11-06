@@ -23,7 +23,7 @@ let BOLD = null;
 
     insertAeRStatsURL();
 
-    showLevel(); // Wait for the levels to be with their levels
+    showLevel(); // Includes showing stats and showing time
 })();
 
 async function insertAeRStatsURL() {
@@ -119,51 +119,9 @@ async function showLevel() {
         header.children[1].innerText = isDescending ? "Nivel ▲" : "Nivel ▼";
     });
 
-    // Set solved time for each problem
-    header.appendChild(document.createElement("th"));
-    column_groups.appendChild(document.createElement("th"));
-    header.children[2].style.width = "130px";
-    header.children[2].title = "Fecha de resolución";
-    header.children[2].innerText = "Fecha ⇅";
-    header.children[2].style.textAlign = "center";
-    column_groups.children[2].className = "dateColumn";
+    showTime(); // Show solved times AFTER levels are shown
 
-    await Promise.all(Array.from(problemNodes.children).map(async (problem) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const userID = urlParams.get('id');
-
-        const problemId = problem.children[0].innerText.split("-")[0].trim();
-        const solvedTime = await getLastSubmissionTime(problemId, userID);
-        problem.appendChild(document.createElement("td"));
-        problem.children[2].innerText = dateToString(solvedTime, false);
-        problem.children[2].title = solvedTime;
-    }));
-
-    // Add sorting functionality to the solved date column
-    header.children[2].style.cursor = "pointer";
-    header.children[2].classList.add("desc"); // Start with descending order
-    header.children[2].addEventListener("click", () => {
-        const rows = Array.from(problemNodes.children);
-        const isDescending = header.children[2].classList.contains("desc");
-        rows.sort((a, b) => {
-            const dateA = new Date(a.children[2].title);
-            const dateB = new Date(b.children[2].title);
-            return isDescending ? dateB - dateA : dateA - dateB;
-        });
-        // Remove existing rows
-        while (problemNodes.firstChild) {
-            problemNodes.removeChild(problemNodes.firstChild);
-        }
-        // Append sorted rows
-        rows.forEach(row => problemNodes.appendChild(row));
-        // Toggle sort direction
-        header.children[2].classList.toggle("asc", isDescending);
-        header.children[2].classList.toggle("desc", !isDescending);
-        // Set arrow indicator
-        header.children[2].innerText = isDescending ? "Fecha ▲" : "Fecha ▼";
-    });
-
-    showStats(); // Show AeR stats after levels are shown
+    showStats(); // Show AeR stats AFTER levels are shown
 }
 
 async function setLevel(problem) {
@@ -208,6 +166,71 @@ async function setLevel(problem) {
     }
 
     return problem_level;
+}
+
+async function showTime() {
+    console.log("Showing problem solved times...");
+
+    try {
+        let finalTable = document.getElementsByClassName("userProblems")[0].children[2];
+        finalTable.children[0].children[0].innerText.trim(); // Intentar acceder a un elemento para verificar si la tabla está cargada
+    }
+    catch (error) {
+        console.log("Table not found yet, waiting...");
+        setTimeout(showTime, 100);
+        return;
+    }
+
+    const table = document.getElementsByClassName("userProblems")[0];
+    if (table.length === 0) return;
+
+    const column_groups = table.children[0];
+    const header = table.children[1].children[0];
+    const problemNodes = table.children[2];
+
+    // Set solved time for each problem
+    header.appendChild(document.createElement("th"));
+    column_groups.appendChild(document.createElement("th"));
+    header.children[2].style.width = "130px";
+    header.children[2].title = "Fecha de resolución";
+    header.children[2].innerText = "Fecha ⇅";
+    header.children[2].style.textAlign = "center";
+    column_groups.children[2].className = "dateColumn";
+
+    await Promise.all(Array.from(problemNodes.children).map(async (problem) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userID = urlParams.get('id');
+
+        const problemId = problem.children[0].innerText.split("-")[0].trim();
+        const solvedTime = await getLastSubmissionTime(problemId, userID);
+        problem.appendChild(document.createElement("td"));
+        problem.children[2].innerText = dateToString(solvedTime, false);
+        problem.children[2].title = solvedTime;
+    }));
+
+    // Add sorting functionality to the solved date column
+    header.children[2].style.cursor = "pointer";
+    header.children[2].classList.add("desc"); // Start with descending order
+    header.children[2].addEventListener("click", () => {
+        const rows = Array.from(problemNodes.children);
+        const isDescending = header.children[2].classList.contains("desc");
+        rows.sort((a, b) => {
+            const dateA = new Date(a.children[2].title);
+            const dateB = new Date(b.children[2].title);
+            return isDescending ? dateB - dateA : dateA - dateB;
+        });
+        // Remove existing rows
+        while (problemNodes.firstChild) {
+            problemNodes.removeChild(problemNodes.firstChild);
+        }
+        // Append sorted rows
+        rows.forEach(row => problemNodes.appendChild(row));
+        // Toggle sort direction
+        header.children[2].classList.toggle("asc", isDescending);
+        header.children[2].classList.toggle("desc", !isDescending);
+        // Set arrow indicator
+        header.children[2].innerText = isDescending ? "Fecha ▲" : "Fecha ▼";
+    });
 }
 
 async function showStats() {
