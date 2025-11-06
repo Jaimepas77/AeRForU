@@ -3,7 +3,7 @@ To run the tests, use this command in the root folder of the project:
 npm test
 */
 
-const { isAC, isTried, getSolvedTime, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition } = require('./getters');
+const { isAC, isTried, getLastSubmissionTime, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition } = require('./getters');
 const levels_dict = require('../data/levels.js');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
@@ -26,14 +26,14 @@ test('isTried: problem 332 of elferni', async () => {
     expect(ret).toBe(false);
 });
 
-test('getSolvedTime: problem 116 of karel-the-robot', async () => {
-    const ret = await getSolvedTime(116, 935);
+test('getLastSubmissionTime: problem 116 of karel-the-robot', async () => {
+    const ret = await getLastSubmissionTime(116, 935);
     expect(ret).toBeInstanceOf(Date);
     expect(ret).toStrictEqual(new Date("2019-01-18T13:02:31Z"));
 });
 
-test('getSolvedTime: problem 332 of elferni', async () => {
-    const ret = await getSolvedTime(332, 8);
+test('getLastSubmissionTime: problem 332 of elferni', async () => {
+    const ret = await getLastSubmissionTime(332, 8);
     expect(ret).toBeNull();
 });
 

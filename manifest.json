@@ -32,6 +32,7 @@
         {
             "js": [
                 "data/levels.js",
+                "scripts/utils/transformers.js",
                 "scripts/getters.js",
                 "scripts/profile.js"
             ],
@@ -54,6 +55,7 @@
         {
             "js": [
                 "data/levels.js",
+                "scripts/utils/transformers.js",
                 "scripts/getters.js",
                 "scripts/problem_stats.js"
             ],

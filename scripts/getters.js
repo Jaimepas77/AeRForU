@@ -39,7 +39,7 @@ async function isTried(problemId, userID) {
     return submissions.submission.length !== 0;
 }
 
-async function getSolvedTime(problemId, userID) {
+async function getLastSubmissionTime(problemId, userID) {
     // Search for an AC submission
     let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
     problem_submissions_url = problem_submissions_url.replace("${userID}", userID);
@@ -322,7 +322,7 @@ async function getUserProblemPosition(user_nick, problemId) {
 }
 
 try {
-    module.exports = { isAC, isTried, getSolvedTime, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition };
+    module.exports = { isAC, isTried, getLastSubmissionTime, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition };
 }
 catch (e) {
     // Do nothing, this is for testing purposes

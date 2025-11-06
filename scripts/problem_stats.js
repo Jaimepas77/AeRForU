@@ -104,12 +104,7 @@ async function loadMoreRankings() {
         data.submission.forEach(entry => {
             const row = document.createElement("tr");
             const submissionDate = new Date(entry.submissionDate);
-            const formattedDate = submissionDate.getFullYear() + '-' +
-                ('0' + (submissionDate.getMonth() + 1)).slice(-2) + '-' +
-                ('0' + submissionDate.getDate()).slice(-2) + ' ' +
-                ('0' + submissionDate.getHours()).slice(-2) + ':' +
-                ('0' + submissionDate.getMinutes()).slice(-2) + ':' +
-                ('0' + submissionDate.getSeconds()).slice(-2);
+            const formattedDate = dateToString(submissionDate);
 
             const language = entry.language === "CPP" ? "C++" : entry.language === "JAVA" ? "Java" : entry.language;
 

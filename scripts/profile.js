@@ -117,8 +117,8 @@ async function showLevel() {
 
     // Set solved time for each problem
     header.appendChild(document.createElement("th"));
-    header.children[2].title = "Tiempo de resolución";
-    header.children[2].innerText = "Tiempo";
+    header.children[2].title = "Fecha de resolución";
+    header.children[2].innerText = "Fecha";
     header.children[2].style.textAlign = "center";
 
     await Promise.all(Array.from(problemNodes.children).map(async (problem) => {
@@ -126,9 +126,9 @@ async function showLevel() {
         const userID = urlParams.get('id');
 
         const problemId = problem.children[0].innerText.split("-")[0].trim();
-        const solvedTime = await getSolvedTime(problemId, userID);
+        const solvedTime = await getLastSubmissionTime(problemId, userID);
         problem.appendChild(document.createElement("td"));
-        problem.children[2].innerText = solvedTime;
+        problem.children[2].innerText = dateToString(solvedTime, false);
     }));
 
     showStats(); // Show AeR stats after levels are shown
