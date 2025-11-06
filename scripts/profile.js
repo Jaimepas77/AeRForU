@@ -120,6 +120,13 @@ async function showLevel() {
         header.children[1].classList.toggle("desc", !isDescending);
         // Set arrow indicator
         header.children[1].innerText = isDescending ? "Nivel ▲" : "Nivel ▼";
+        // Remove sorting classes from other headers
+        Array.from(header.children).forEach(header_node => {
+            if (header_node !== header.children[1]) {
+                header_node.classList.remove("asc", "desc");
+                header_node.innerText = header_node.innerText.replace("▲", "⇅").replace("▼", "⇅");
+            }
+        });
     });
 
     showTime(); // Show solved times AFTER levels are shown
@@ -234,6 +241,13 @@ async function showTime() {
         header_element.classList.toggle("desc", !isDescending);
         // Set arrow indicator
         header_element.innerText = isDescending ? "Fecha ▲" : "Fecha ▼";
+        // Remove sorting classes from other headers
+        Array.from(header.children).forEach(header_node => {
+            if (header_node !== header_element) {
+                header_node.classList.remove("asc", "desc");
+                header_node.innerText = header_node.innerText.replace("▲", "⇅").replace("▼", "⇅");
+            }
+        });
     });
 }
 
