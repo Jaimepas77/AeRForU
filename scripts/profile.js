@@ -209,7 +209,15 @@ async function showTime() {
 
     await Promise.all(Array.from(problemNodes.children).map(async (problem) => {
         const urlParams = new URLSearchParams(window.location.search);
-        const userID = urlParams.get('id');
+        let userID = urlParams.get('id');
+        if (userID === null) {
+            userID = await new Promise((resolve) => { // Try cache
+                chrome.storage.local.get("userID", function (data) {
+                    resolve(data.userID);
+                });
+            });
+            if (userID === undefined) return; // TODO: fix this case (retrieve id based on webscrapped username)
+        }
 
         const problemId = problem.children[0].innerText.split("-")[0].trim();
         const solvedTime = await getLastSubmissionTime(problemId, userID);
