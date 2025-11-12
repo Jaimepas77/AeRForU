@@ -1,3 +1,6 @@
+// getters.js (parcheado)
+
+// --- funciones anteriores (sin cambios) ---
 async function isAC(problemId, userID) {
     // Search for an AC submission
     let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
@@ -301,25 +304,78 @@ async function getLevelsText(type=1) {
     };
 }
 
+// --- getUserProblemPosition (versión optimizada con carrera paralela) ---
+/**
+ * Obtiene la posición real del usuario en el ranking de un problema.
+ * Ejecuta dos estrategias en paralelo y devuelve la primera que tenga éxito:
+ * 
+ * 1. Aerdata (rápido): https://aerdata.lluiscab.net/aer/user/profile/${user_nick}
+ *    - Respuesta instantánea si está disponible
+ * 
+ * 2. Fallback (completo): https://aceptaelreto.com/ws/problem/${problemId}/ranking
+ *    - Pagina el ranking completo usando nextLink
+ *    - Se ejecuta en paralelo con Aerdata, por lo que no añade latencia si Aerdata tiene éxito
+ * 
+ * Devuelve:
+ *  - número (1-based) si se encuentra en cualquiera de las dos fuentes
+ *  - null si no se encuentra o ambas fuentes fallan
+ */
 async function getUserProblemPosition(user_nick, problemId) {
-    let position_url = `https://aerdata.lluiscab.net/aer/user/profile/${user_nick}`;
-
+    let winner = null;
+    
+    // Intento 1: Aerdata
+    const tryAerdata = async () => {
+        try {
+            const data = await fetch(`https://aerdata.lluiscab.net/aer/user/profile/${encodeURIComponent(user_nick)}`).then(r => r.json());
+            const pos = data?.data?.user?.problems?.find(p => String(p.id) === String(problemId))?.result?.position;
+            
+            if (pos) { winner = 'aerdata'; return pos; }
+        } catch {} throw new Error();
+    };
+    
+    // Intento 2: Fallback
+    const tryFallback = async () => {
+        const userId = String(await getUserID(user_nick));
+        const userNick = user_nick.trim().toLowerCase();
+        let nextUrl = `https://aceptaelreto.com/ws/problem/${problemId}/ranking?start=1&size=100`;
+        
+        const seen = new Set();
+        let rank = 0;
+        
+        while (nextUrl) {
+            try {
+                const data = await fetch(nextUrl).then(r => r.json());
+                
+                for (const sub of data.submission) {
+                    const uid = sub.user?.id ? String(sub.user.id) : null;
+                    const nick = sub.user?.nick?.trim().toLowerCase();
+                    const key = uid || `nick:${nick || ''}`;
+                    
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        rank++;
+                        
+                        if ((uid && uid === userId) || (nick && nick === userNick)) {
+                            winner = 'fallback';
+                            return rank;
+                        }
+                    }
+                }
+                
+                nextUrl = data.nextLink;
+            } catch { break; }
+        }throw new Error();
+    };
+    
     try {
-        const response = await fetch(position_url);
-        const data = await response.json();
-        problems = data.data.user.problems;
-        for (const problem of problems) {
-            // console.log(problem);
-            if (problem.id == problemId) {
-                return problem.result.position;
-            }
-        }
-        return null; // Problem not found in user's solved problems
-    } catch (error) {
-        console.error("Error fetching user problem position:", error);
-        return null;
-    }
+        const result = await Promise.any([tryAerdata(), tryFallback()]);
+        console.log(`✅ Posición: ${result} (${winner === 'aerdata' ? 'Aerdata' : 'Fallback'})`);
+        return result;
+    } catch { console.log("ℹ️ No encontrado"); return null; }
 }
+
+
+// --- resto del archivo original (sin cambios) ---
 
 try {
     module.exports = { isAC, isTried, getLastSubmissionTime, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition };
