@@ -1,6 +1,3 @@
-// getters.js (parcheado)
-
-// --- funciones anteriores (sin cambios) ---
 async function isAC(problemId, userID) {
     // Search for an AC submission
     let problem_submissions_url = "https://aceptaelreto.com/ws/user/${userID}/submissions/problem/${problemId}";
@@ -288,81 +285,82 @@ async function getLevelsText(type=1) {
     };
 }
 
-// --- getUserProblemPosition (versión optimizada con carrera paralela) ---
-/**
- * Obtiene la posición real del usuario en el ranking de un problema.
- * Ejecuta dos estrategias en paralelo y devuelve la primera que tenga éxito:
- * 
- * 1. Aerdata (rápido): https://aerdata.lluiscab.net/aer/user/profile/${user_nick}
- *    - Respuesta instantánea si está disponible
- * 
- * 2. Fallback (completo): https://aceptaelreto.com/ws/problem/${problemId}/ranking
- *    - Pagina el ranking completo usando nextLink
- *    - Se ejecuta en paralelo con Aerdata, por lo que no añade latencia si Aerdata tiene éxito
- * 
- * Devuelve:
- *  - número (1-based) si se encuentra en cualquiera de las dos fuentes
- *  - null si no se encuentra o ambas fuentes fallan
- */
 async function getUserProblemPosition(user_nick, problemId) {
     let winner = null;
-    
-    // Intento 1: Aerdata
+    const normalizedKey = `aer_user_${user_nick.trim().toLowerCase()}`;
+    const cached = await new Promise(resolve => chrome.storage.local.get(normalizedKey, data => resolve(data[normalizedKey])));
+
+    // --- Intento 1: Aerdata (si tenemos nick original en cache, usarlo)
     const tryAerdata = async () => {
         try {
-            const data = await fetch(`https://aerdata.lluiscab.net/aer/user/profile/${encodeURIComponent(user_nick)}`).then(r => r.json());
+            const aerNick = (cached && cached.nick) ? cached.nick : user_nick;
+            const data = await fetch(`https://aerdata.lluiscab.net/aer/user/profile/${encodeURIComponent(aerNick)}`).then(r => r.json());
             const pos = data?.data?.user?.problems?.find(p => String(p.id) === String(problemId))?.result?.position;
-            
             if (pos) { winner = 'aerdata'; return pos; }
-        } catch {} throw new Error();
+        } catch (e) {
+            console.log("Aerdata error", e);
+        }
+        throw new Error();
     };
-    
-    // Intento 2: Fallback
+
+    // --- Intento 2: Fallback (si encuentra uid/nick con case original, guardarlo)
     const tryFallback = async () => {
-        const userId = String(await getUserID(user_nick));
+        const userIdFromCache = cached && cached.uid ? String(cached.uid) : null;
+        const userId = userIdFromCache || String(await getUserID(user_nick));
         const userNick = user_nick.trim().toLowerCase();
-        let nextUrl = `https://aceptaelreto.com/ws/problem/${problemId}/ranking?start=1&size=100`;
-        
-        const seen = new Set();
+        let nextUrl = `https://aceptaelreto.com/ws/problem/${problemId}/ranking?start=1&size=20`;
+
         let rank = 0;
-        
+
         while (nextUrl) {
             try {
                 const data = await fetch(nextUrl).then(r => r.json());
-                
+
                 for (const sub of data.submission) {
                     const uid = sub.user?.id ? String(sub.user.id) : null;
-                    const nick = sub.user?.nick?.trim().toLowerCase();
-                    const key = uid || `nick:${nick || ''}`;
-                    
-                    if (!seen.has(key)) {
-                        seen.add(key);
-                        rank++;
-                        
-                        if ((uid && uid === userId) || (nick && nick === userNick)) {
-                            winner = 'fallback';
-                            return rank;
+                    const nickRaw = sub.user?.nick || null;
+                    const nickLower = nickRaw ? nickRaw.trim().toLowerCase() : null;
+
+                    rank++;
+
+                    if ((uid && userId && uid === userId) || (nickLower && nickLower === userNick)) {
+                        winner = 'fallback';
+                        const newValue = { uid: uid || userId, nick: nickRaw || user_nick };
+                        const needsSet = !cached || cached.uid !== newValue.uid || cached.nick !== newValue.nick;
+
+                        if (needsSet) {
+                            chrome.storage.local.set({ [normalizedKey]: newValue }, () => {
+                                if (chrome.runtime.lastError) { console.log("Error saving user cache:", chrome.runtime.lastError); } 
+                                else { console.log(`🧩 Guardado ${normalizedKey} ->`, newValue); }
+                            });
                         }
+
+                        return rank;
                     }
                 }
-                
+
                 nextUrl = data.nextLink;
-            } catch { break; }
-        }throw new Error();
+            } catch (e) {
+                // fetch fallo o formato inesperado
+                break;
+            }
+        }
+
+        throw new Error();
     };
-    
+
     try {
         const result = await Promise.any([tryAerdata(), tryFallback()]);
-        console.log(`✅ Posición: ${result} (${winner === 'aerdata' ? 'Aerdata' : 'Fallback'})`);
+        //console.log(`✅ Posición: ${result} (${winner === 'aerdata' ? 'Aerdata' : 'Fallback'})`);
         return result;
-    } catch { console.log("ℹ️ No encontrado"); return null; }
+    } catch {
+        //console.log("ℹ️ No encontrado");
+        return null;
+    }
 }
 
-
-// --- resto del archivo original (sin cambios) ---
-
 try {
-    module.exports = { isAC, isTried, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition };
+    module.exports = { isAC, isTried, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemLevel, getLevelsText, getUserProblemPosition };
 }
 catch (e) {
     // Do nothing, this is for testing purposes
