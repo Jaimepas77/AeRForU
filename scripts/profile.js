@@ -287,6 +287,7 @@ async function showStats() {
 async function displayAverageLevel(problemLevels, dashboard) {
     const validLevels = problemLevels.filter(level => level !== null);
     const averageLevel = validLevels.reduce((sum, level) => sum + level, 0) / validLevels.length;
+    // if (isNaN(averageLevel)) return; // No solved problems with known level
     console.log("Average level:", averageLevel.toFixed(2));
     
     // Insert into profile page
@@ -298,7 +299,7 @@ async function displayAverageLevel(problemLevels, dashboard) {
                 <h3 class="panel-title text-center">Nivel medio</h3>
             </div>
             <div class="panel-body text-box text-center">
-                ${averageLevel.toFixed(2)}
+                ${averageLevel.toFixed(2)} <!-- This will be replaced by a progress bar! -->
             </div>
         </div>
     `;
@@ -369,6 +370,7 @@ async function displayProblemsSolvedByLevel(problemLevels, dashboard=null) {
 }
 
 function createProgressBar(cell, problem_level=null) {
+    if (isNaN(problem_level)) problem_level = null;
     cell.innerHTML = ''; // Clear the cell
 
     const progressContainer = document.createElement("div");
