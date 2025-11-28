@@ -39,8 +39,8 @@ chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
 })();
 
 async function insertAeRStatsURL(problem_id) {
-    // If problemId is not a number, return
-    if (isNaN(problem_id)) return;
+    // If problemId is not a valid id, return
+    if (problem_id === null || problem_id === undefined) return;
 
     // Insert the AeR stats URL next to the profile header
     const profileHeader = document.querySelector('h1');
