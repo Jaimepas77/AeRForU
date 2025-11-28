@@ -121,6 +121,7 @@ async function isVolumeCompleted(volumeId, userID) {
     }
 }
 
+/* Warning: it is slow */
 async function getUserID(username) {
     // console.log("New username: " + username);
     const baseSearchUrl = "https://aceptaelreto.com/bin/search.php?search_query=${username}&commit=searchUser&search_currentPage=%2Fuser%2Fprofile.php";
