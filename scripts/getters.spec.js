@@ -3,7 +3,7 @@ To run the tests, use this command in the root folder of the project:
 npm test
 */
 
-const { isAC, isTried, getLastSubmissionTime, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition } = require('./getters');
+const { isAC, isTried, getLastSubmissionTime, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemSummaryHTML, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition } = require('./getters');
 const levels_dict = require('../data/levels.js');
 
 test('isAC: problem 200 of jjjjjjjp022', async () => {
@@ -107,6 +107,19 @@ test('getProblemInfo: problem 100', async () => {
     const ret = await getProblemInfo(100);
     expect(ret.num).toBe(100);
     expect(ret.title).toBe("Constante de Kaprekar");
+});
+
+/*
+jsdom v21 is the last version that supports this kind of import in CommonJS.
+From v22 onwards, jsdom only supports ESM modules.
+jsdom is only needed for the following test.
+*/
+const { JSDOM } = require("jsdom");
+global.DOMParser = new JSDOM().window.DOMParser;
+test('getProblemSummaryHTML: problem 100', async () => {
+    const ret = await getProblemSummaryHTML(100);
+    expect(ret).toContain("<h1>Constante de Kaprekar</h1>");
+    expect(ret).toContain("curiosa característica del número 6174");
 });
 
 test('getProblemRanking: problem 116', async () => {

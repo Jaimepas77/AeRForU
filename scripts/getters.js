@@ -258,6 +258,36 @@ async function getProblemInfo(problemId) {
     return problem_data;
 }
 
+async function getProblemSummaryHTML(problemId) {
+    let problem_summary_url = `https://aceptaelreto.com/problem/statement.php?id=${problemId}`;
+    try {
+        const request = await fetch(problem_summary_url);
+        const problemHTML = await request.text();
+        const doc = new DOMParser().parseFromString(problemHTML, "text/html");
+
+        // 1. Title
+        const titleParent = doc.querySelector(".col-md-10");
+        const titleHtml = titleParent.querySelector("h1").outerHTML;
+
+        // 2. Elements between .limits and the <h2> "Entrada"
+        const limits = doc.querySelector(".limits");
+        const targetTitle = doc.querySelector("h2#inputDescription") || 
+                            Array.from(doc.querySelectorAll("h2"))
+                                .find(h => h.textContent.trim() === "Entrada");
+
+        const between = [];
+        for (let el = limits.nextElementSibling; el && el !== targetTitle; el = el.nextElementSibling) {
+            between.push(el.outerHTML);
+        }
+
+        return titleHtml + "\n" + between.join("\n");
+    } catch (error) {
+        console.error(`Failed to fetch or parse problem summary for problem ID ${problemId}:`, error);
+        return null;
+    }
+}
+
+
 async function getProblemRanking(problemId, start=1, size=20) {
     let problem_ranking_url = `https://aceptaelreto.com/ws/problem/${problemId}/ranking?start=${start}&n=${size}`;
     const request = await fetch(problem_ranking_url);
@@ -323,7 +353,7 @@ async function getUserProblemPosition(user_nick, problemId) {
 }
 
 try {
-    module.exports = { isAC, isTried, getLastSubmissionTime, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition };
+    module.exports = { isAC, isTried, getLastSubmissionTime, isCategoryCompleted, isVolumeCompleted, getUserID, getNick, getLastError, getProblemCategories, isProblemsCategory, getCategoryData, getCategoryProblems, getProblemInfo, getProblemSummaryHTML, getProblemRanking, getProblemLevel, getLevelsText, getUserProblemPosition };
 }
 catch (e) {
     // Do nothing, this is for testing purposes

@@ -21,6 +21,17 @@
         {
             "js": [
                 "data/levels.js",
+                "data/icons.js",
+                "scripts/getters.js",
+                "scripts/home.js"
+            ],
+            "matches": [
+                "*://aceptaelreto.com/"
+            ]
+        },
+        {
+            "js": [
+                "data/levels.js",
                 "scripts/getters.js",
                 "scripts/content.js",
                 "scripts/update.js"
@@ -32,6 +43,7 @@
         {
             "js": [
                 "data/levels.js",
+                "data/icons.js",
                 "scripts/utils/transformers.js",
                 "scripts/getters.js",
                 "scripts/profile.js"
