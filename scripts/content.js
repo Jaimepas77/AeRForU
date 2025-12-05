@@ -273,32 +273,41 @@ async function highlightTitles(userID) {
         const problemNodes = table.children[3];
         // console.log(problemNodes.children);
 
-        for (const problem of problemNodes.children) {
-            // Llamada asíncrona (se ejecutan en paralelo)
-            highlightProblemNode(problem, userID);
-        }
+        const results = await Promise.all(Array.from(problemNodes.children).map(problem => highlightProblemNode(problem, userID)));
+
+        const solvedProblems = results.filter(r => r).length; // Count true values
+        const totalProblems = results.length;
+        console.log("Solved: " + solvedProblems + "/" + totalProblems);
+
+        // Show solved problems count inside problemsInfo.children[0] text (add at the end)
+        const countSpan = document.createElement('span');
+        countSpan.innerText = ` (${solvedProblems}/${totalProblems})`;
+        countSpan.style.fontSize = "0.8em";
+        problemsInfo.children[0].appendChild(countSpan);
     }
     console.log("End of AeRForU");
 }
 
 async function highlightProblemNode(problem, userID) {
+    if (BOLD) {
+        problem.children[0].style.fontWeight = "bold";
+        problem.children[1].style.fontWeight = "bold";
+    }
+
     const title = problem.children[1].innerText.trim();
     const problemId = problem.children[0].innerText.trim();
     // console.log("Title: " + title);
     //if (wordsToAc.length > 0 && wordsToAc.includes(title)) {
     if (await isAC(problemId, userID)) {
         problem.style.backgroundColor = AcColor;
+        return true;
     }
     //else if (wordsToWa.length > 0 && wordsToWa.includes(title)) {
     else if (await isTried(problemId, userID)) {
         problem.style.backgroundColor = WaColor;
         addError(problem, userID);
     }
-
-    if (BOLD) {
-        problem.children[0].style.fontWeight = "bold";
-        problem.children[1].style.fontWeight = "bold";
-    }
+    return false;
 }
 
 async function addError(problem, userID) {
