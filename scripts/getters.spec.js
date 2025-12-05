@@ -112,7 +112,7 @@ test('getProblemInfo: problem 100', async () => {
 /*
 jsdom v21 is the last version that supports this kind of import in CommonJS.
 From v22 onwards, jsdom only supports ESM modules.
-jsdom is only needed for the following test.
+jsdom is only needed for the getProblemSummaryHTML tests.
 */
 const { JSDOM } = require("jsdom");
 global.DOMParser = new JSDOM().window.DOMParser;
@@ -120,6 +120,11 @@ test('getProblemSummaryHTML: problem 100', async () => {
     const ret = await getProblemSummaryHTML(100);
     expect(ret).toContain("<h1>Constante de Kaprekar</h1>");
     expect(ret).toContain("curiosa característica del número 6174");
+});
+
+test('getProblemSummaryHTML: non existing problem', async () => {
+    const ret = await getProblemSummaryHTML(1);
+    expect(ret).toBeNull();
 });
 
 test('getProblemRanking: problem 116', async () => {
