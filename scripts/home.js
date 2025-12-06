@@ -20,7 +20,7 @@ async function showLevel() {
 
     if (!SHOW_LEVEL) return;
 
-    console.log("Showing problem levels...");
+    // console.log("Showing problem levels...");
     
     // Extract problem id from hyperlink
     const readmoreLink = document.getElementsByClassName('readMore')[0].children[0];
@@ -81,19 +81,48 @@ async function insertNewProblemButton() {
 
     // Add click event to the button to fetch a new random problem
     refresh_button.addEventListener('click', async () => {
+        await informLoadingProblemData();
         const randomProblemId = await getRandomProblem();
         await replaceProblemData(randomProblemId);
         showLevel();
     });
 }
 
-async function getRandomProblem() {
+async function getRandomProblem(notSolvedByUser=true) {
     // Get a random problem ID from the ones with level data
     // levels_dict is a dict with problem IDs as keys
     const problemIds = Object.keys(levels_dict);
-    const randomIndex = Math.floor(Math.random() * problemIds.length);
-    const randomProblemId = problemIds[randomIndex];
+
+    let randomIndex = Math.floor(Math.random() * problemIds.length);
+    let randomProblemId = problemIds[randomIndex];
+
+    let count = 0;
+    while (notSolvedByUser && count < 100) {
+        let userID = await new Promise((resolve) => { // Try cache
+            chrome.storage.local.get("userID", function (data) {
+                resolve(data.userID);
+            });
+        });
+        // userID = 3428; // AperezaC for testing
+
+        if (userID === undefined)
+            break;
+        if (await isAC(randomProblemId, userID) === false)
+            break;
+        console.log(`Problem ${randomProblemId} already solved, trying another one...`);
+
+        randomIndex = Math.floor(Math.random() * problemIds.length);
+        randomProblemId = problemIds[randomIndex];
+        count += 1; // If problem is already solved, try again (up to 100 times)
+    }
+
     return randomProblemId;
+}
+
+async function informLoadingProblemData() {
+    // Get class "statement" (div)
+    const classStatement = document.getElementsByClassName('statement')[0];
+    classStatement.innerHTML = '<h1>Cargando nuevo problema...</h1>';
 }
 
 async function replaceProblemData(problemId=100) {
@@ -101,8 +130,6 @@ async function replaceProblemData(problemId=100) {
 
     // Get class "statement" (div)
     const classStatement = document.getElementsByClassName('statement')[0];
-
-    classStatement.innerHTML = '<h1>Cargando nuevo problema...</h1>';
 
     const problemHTML = await getProblemSummaryHTML(problemId);
     if (!problemHTML) {
