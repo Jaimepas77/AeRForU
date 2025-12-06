@@ -1,6 +1,53 @@
+let SHOW_LEVEL = null;
+
+chrome.storage.local.get(['SHOW_LEVEL'], function(data) {
+    if (data.SHOW_LEVEL !== undefined) {
+        SHOW_LEVEL = data.SHOW_LEVEL;
+    }
+    else {
+        chrome.storage.local.set({ SHOW_LEVEL: true });
+        SHOW_LEVEL = true;
+    }
+});
+
 (async function() {
     insertNewProblemButton();
+    showLevel();
 })();
+
+async function showLevel() {
+    if (SHOW_LEVEL === null) setTimeout(showLevel, 100);
+
+    if (!SHOW_LEVEL) return;
+
+    console.log("Showing problem levels...");
+    
+    // Extract problem id from hyperlink
+    const readmoreLink = document.getElementsByClassName('readMore')[0].children[0];
+    const problem_id = readmoreLink ? readmoreLink.getAttribute('href').split('=')[1].split('&')[0] : null;
+
+    const problem_level = await getProblemLevel(problem_id);
+
+    // DOM manipulation
+    const exercise_div = document.getElementsByClassName("statement")[0]?.children[0];
+    if (!exercise_div) {
+        console.error("Could not find statement element");
+        return;
+    }
+
+    // Create div and append in the first position
+    const level_div = document.createElement("div");
+    level_div.style.cssText = `
+        font-size: 16px;
+        margin-bottom: -6px;
+        margin-top: 0px;
+    `;
+    
+    exercise_div.insertBefore(level_div, exercise_div.children[0]);
+    
+    // Create progress bar with initial 0 value, then animate to actual value
+    await createProgressBarWithAnimation(level_div, problem_level);
+}
 
 async function insertNewProblemButton() {
     // Get title element to insert the button next to it
@@ -36,6 +83,7 @@ async function insertNewProblemButton() {
     refresh_button.addEventListener('click', async () => {
         const randomProblemId = await getRandomProblem();
         await replaceProblemData(randomProblemId);
+        showLevel();
     });
 }
 

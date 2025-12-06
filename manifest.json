@@ -23,6 +23,7 @@
                 "data/levels.js",
                 "data/icons.js",
                 "scripts/getters.js",
+                "scripts/problem_statement_level.js",
                 "scripts/home.js"
             ],
             "matches": [
@@ -58,6 +59,7 @@
                 "scripts/getters.js",
                 "scripts/problem_statement_categories.js",
                 "scripts/problem_statement_recommendations.js",
+                "scripts/problem_statement_level.js",
                 "scripts/problem_statement.js"
             ],
             "matches": [
@@ -69,6 +71,7 @@
                 "data/levels.js",
                 "scripts/utils/transformers.js",
                 "scripts/getters.js",
+                "scripts/problem_statement_level.js",
                 "scripts/problem_stats.js"
             ],
             "matches": [
