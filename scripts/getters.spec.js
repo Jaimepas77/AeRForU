@@ -170,7 +170,7 @@ test('getLevelsText: stars', async () => {
     expect(ret.hard).toBe("★★★");
 });
 
-test('getUserProblemPosition: problem 706 of dopamina', async () => {
-    const ret = await getUserProblemPosition("dopamina", 706);
+test('getUserProblemPosition: problem 727 of AperezaC', async () => {
+    const ret = await getUserProblemPosition("AperezaC", 727);
     expect(ret).toBe(1);
 });
