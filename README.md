@@ -22,7 +22,7 @@ Mejoramos tu experiencia de usuario (UX) con las siguientes herramientas:
 * **✅ Rastreo de Progreso:** Marcado visual claro de problemas **Resueltos (AC)** e **Intentados** en los listados.
 * **💾 Backup de Código:** Descarga en un clic todo el código de tus envíos con resultado *Accepted*.
 * **🎲 Modo Exploración:** Botón para saltar a problemas aleatorios desde la página de inicio.
-* **🔗 Enlaces Rápidos:** Acceso directo a las estadísticas de *AER Stats*.
+* **🔗 Enlaces Rápidos:** Acceso directo a las estadísticas de [*AER Stats*](https://aer.lluiscab.net/).
 
 ## 📸 Capturas de Pantalla
 
