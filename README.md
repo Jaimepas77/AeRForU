@@ -26,6 +26,7 @@ Mejoramos tu experiencia de usuario (UX) con las siguientes herramientas:
 
 ## 📸 Capturas de Pantalla
 
+https://youtu.be/G-cCFW14NPo
 | Listado de problemas | Enunciado |
 |:---:|:---:|
 | ![Lista](/images/example_list.png) | ![Enunciado](/images/example_statement.png) |
